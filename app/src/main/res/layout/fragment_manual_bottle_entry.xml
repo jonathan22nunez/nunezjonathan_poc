@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical" android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <TextView
+        android:id="@+id/textView_bottle_date"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="09/20/19"
+        android:textSize="24sp"
+        android:layout_gravity="center"
+        android:layout_marginTop="20dp"/>
+
+    <EditText
+        android:id="@+id/editText_bottle_startTime"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Start Time"
+        android:layout_marginTop="40dp"/>
+
+    <EditText
+        android:id="@+id/editText_bottle_endTime"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="End Time"
+        android:layout_marginTop="40dp"/>
+
+    <EditText
+        android:id="@+id/editText_bottle_start_amount"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Starting Amount"
+        android:layout_marginTop="40dp"/>
+
+    <EditText
+        android:id="@+id/editText_bottle_end_amount"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Ending Amount"
+        android:layout_marginTop="40dp"/>
+
+    <Button
+        android:id="@+id/button_save_manual_sleep"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Save"
+        android:layout_gravity="center"
+        android:layout_marginTop="64dp"/>
+
+</LinearLayout>

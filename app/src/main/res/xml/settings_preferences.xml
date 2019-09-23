@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <PreferenceCategory
+        android:title="Data">
+
+        <SwitchPreference
+            android:key="cloudSyncEnabled"
+            android:title="Cloud Sync Enabled"
+            android:summary="Enable Cloud based services"
+            android:enabled="false"/>
+
+        <Preference
+            android:key="syncDevices"
+            android:title="Sync Devices"
+            android:summary="Sync all registered devices to the most recent data"
+            android:enabled="false"/>
+
+        <Preference
+            android:key="backupData"
+            android:title="Backup Data"
+            android:summary="Force data upload to the Cloud"
+            android:enabled="false"/>
+
+        <Preference
+            android:key="restoreData"
+            android:title="Restore Data"
+            android:summary="Restore all data from last Cloud Backup"
+            android:enabled="false"/>
+
+    </PreferenceCategory>
+
+    <PreferenceCategory
+        android:title="Account Management">
+
+        <SwitchPreference
+            android:key="signInEnabled"
+            android:title="Sign-In Enabled"
+            android:summary="Secure your data by requiring a login"/>
+
+        <Preference
+            android:key="signOut"
+            android:title="Sign-Out"
+            android:enabled="false"/>
+
+        <Preference
+            android:key="deleteAll"
+            android:title="Delete All"
+            android:summary="This will delete all data currently on the device and the associated Cloud data"
+            android:enabled="false"/>
+
+    </PreferenceCategory>
+
+</PreferenceScreen>

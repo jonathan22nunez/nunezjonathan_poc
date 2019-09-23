@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "435474263470",
+    "firebase_url": "https://nunezjonathanpoc.firebaseio.com",
+    "project_id": "nunezjonathanpoc",
+    "storage_bucket": "nunezjonathanpoc.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:435474263470:android:76743cd7b6774f6e03ec3f",
+        "android_client_info": {
+          "package_name": "com.example.nunezjonathan_poc"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "435474263470-8rv79s7p5ib9qp54lo9ub1qijv83v3gn.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.nunezjonathan_poc",
+            "certificate_hash": "4bf03ee8922c40e34925c96510d4f0cbadadff4d"
+          }
+        },
+        {
+          "client_id": "435474263470-aa9aies8fqg3tbvn4j0gec0bhcd1k6jg.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDXT3lHIm9LD7yQQGb7vK86waIAHYfinXg"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "435474263470-aa9aies8fqg3tbvn4j0gec0bhcd1k6jg.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

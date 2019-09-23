@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <item
+        android:id="@+id/navigation_overview"
+        android:title="Overview"
+        android:icon="@drawable/ic_overview"/>
+
+    <item
+        android:id="@+id/navigation_sleep"
+        android:title="Sleep"
+        android:icon="@drawable/ic_sleep"/>
+
+    <item
+        android:id="@+id/navigation_feeding"
+        android:title="Feeding"
+        android:icon="@drawable/ic_bottle"/>
+
+    <item
+        android:id="@+id/navigation_diaper"
+        android:title="Diaper"
+        android:icon="@drawable/ic_diaper"/>
+
+    <item
+        android:id="@+id/navigation_health"
+        android:title="Health"
+        android:icon="@drawable/ic_health"/>
+
+</menu>

@@ -1,0 +1,8 @@
+<resources>
+    <string name="app_name">NunezJonathan_poc</string>
+    <string name="title_home">Home</string>
+    <string name="title_dashboard">Dashboard</string>
+    <string name="title_notifications">Notifications</string>
+
+    <string name="manual_entry"><u>Manual Entry</u></string>
+</resources>

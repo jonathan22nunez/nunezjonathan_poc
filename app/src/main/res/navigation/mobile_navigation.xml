@@ -1,0 +1,149 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/mobile_navigation"
+    app:startDestination="@id/navigation_overview">
+
+    <fragment
+        android:id="@+id/navigation_overview"
+        android:name="com.example.nunezjonathan_poc.ui.overview.OverviewFragment"
+        android:label="Daily Overview"
+        tools:layout="@layout/fragment_overview">
+        <action
+            android:id="@+id/action_navigation_overview_to_settingsFragment"
+            app:destination="@id/settingsFragment"
+            app:popUpTo="@+id/navigation_overview" />
+        <action
+            android:id="@+id/action_navigation_overview_to_childrenListFragment"
+            app:destination="@id/childrenListFragment"
+            app:popUpTo="@+id/navigation_overview" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/navigation_sleep"
+        android:name="com.example.nunezjonathan_poc.ui.sleep.SleepFragment"
+        android:label="Sleep"
+        tools:layout="@layout/fragment_sleep" >
+        <action
+            android:id="@+id/action_navigation_sleep_to_manualSleepFragment"
+            app:destination="@id/manualSleepFragment"
+            app:popUpTo="@+id/navigation_sleep" />
+        <action
+            android:id="@+id/action_navigation_sleep_to_sleepLogLIstFragment"
+            app:destination="@id/sleepLogLIstFragment"
+            app:popUpTo="@+id/navigation_sleep" />
+        <action
+            android:id="@+id/action_navigation_sleep_to_childrenListFragment"
+            app:destination="@id/childrenListFragment"
+            app:popUpTo="@+id/navigation_sleep" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/navigation_feeding"
+        android:name="com.example.nunezjonathan_poc.ui.feeding.FeedingFragment"
+        android:label="Feeding"
+        tools:layout="@layout/fragment_feeding"/>
+
+    <fragment
+        android:id="@+id/navigation_diaper"
+        android:name="com.example.nunezjonathan_poc.ui.diaper.DiaperFragment"
+        android:label="Diaper"
+        tools:layout="@layout/fragment_diaper" >
+        <action
+            android:id="@+id/action_navigation_diaper_to_soiledDiaperFragment"
+            app:destination="@id/soiledDiaperFragment"
+            app:popUpTo="@+id/navigation_diaper" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/navigation_health"
+        android:name="com.example.nunezjonathan_poc.ui.health.HealthFragment"
+        android:label="Health"
+        tools:layout="@layout/fragment_health" >
+        <action
+            android:id="@+id/action_navigation_health_to_symptomFragment"
+            app:destination="@id/symptomFragment"
+            app:popUpTo="@+id/navigation_health" />
+        <action
+            android:id="@+id/action_navigation_health_to_medicationFragment"
+            app:destination="@id/medicationFragment"
+            app:popUpTo="@+id/navigation_health" />
+        <action
+            android:id="@+id/action_navigation_health_to_temperatureFragment"
+            app:destination="@id/temperatureFragment"
+            app:popUpTo="@+id/navigation_health" />
+    </fragment>
+    <fragment
+        android:id="@+id/navigation_bottle"
+        android:name="com.example.nunezjonathan_poc.ui.feeding.BottleFragment"
+        android:label="fragment_bottle"
+        tools:layout="@layout/fragment_bottle" />
+    <fragment
+        android:id="@+id/navigation_nurse"
+        android:name="com.example.nunezjonathan_poc.ui.feeding.NurseFragment"
+        android:label="fragment_nurse"
+        tools:layout="@layout/fragment_nurse" />
+    <fragment
+        android:id="@+id/soiledDiaperFragment"
+        android:name="com.example.nunezjonathan_poc.ui.diaper.SoiledDiaperFragment"
+        android:label="Diaper Details"
+        tools:layout="@layout/fragment_soiled_diaper" />
+    <fragment
+        android:id="@+id/manualSleepFragment"
+        android:name="com.example.nunezjonathan_poc.ui.sleep.ManualSleepFragment"
+        android:label="Manual Entry"
+        tools:layout="@layout/fragment_manual_sleep_entry" />
+    <fragment
+        android:id="@+id/sleepLogLIstFragment"
+        android:name="com.example.nunezjonathan_poc.ui.sleep.SleepLogLIstFragment"
+        android:label="Sleep Log"
+        tools:layout="@layout/fragment_sleep_log" />
+    <fragment
+        android:id="@+id/bottleDetailsFragment"
+        android:name="com.example.nunezjonathan_poc.ui.feeding.BottleDetailsFragment"
+        android:label="Bottle Details"
+        tools:layout="@layout/fragment_bottle_details" />
+    <fragment
+        android:id="@+id/manualBottleFragment"
+        android:name="com.example.nunezjonathan_poc.ui.feeding.ManualBottleFragment"
+        android:label="Manual Entry"
+        tools:layout="@layout/fragment_manual_bottle_entry" />
+    <fragment
+        android:id="@+id/symptomFragment"
+        android:name="com.example.nunezjonathan_poc.ui.symptom.SymptomFragment"
+        android:label="Symptom Entry"
+        tools:layout="@layout/fragment_symptom" />
+    <fragment
+        android:id="@+id/medicationFragment"
+        android:name="com.example.nunezjonathan_poc.ui.medication.MedicationFragment"
+        android:label="Medicaiton Entry"
+        tools:layout="@layout/fragment_medication" />
+    <fragment
+        android:id="@+id/temperatureFragment"
+        android:name="com.example.nunezjonathan_poc.ui.temperature.TemperatureFragment"
+        android:label="Temperature Entry"
+        tools:layout="@layout/fragment_temperature" />
+    <fragment
+        android:id="@+id/settingsFragment"
+        android:name="com.example.nunezjonathan_poc.ui.preferences.SettingsFragment"
+        android:label="Settings" />
+    <fragment
+        android:id="@+id/childrenListFragment"
+        android:name="com.example.nunezjonathan_poc.ui.children.ChildrenListFragment"
+        android:label="Children">
+        <action
+            android:id="@+id/action_childrenListFragment_to_childrenDetailsFragment"
+            app:destination="@id/childrenDetailsFragment" />
+        <action
+            android:id="@+id/action_childrenListFragment_to_childrenDetailsFragment2"
+            app:destination="@id/childrenDetailsFragment"
+            app:popUpTo="@+id/childrenListFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/childrenDetailsFragment"
+        android:name="com.example.nunezjonathan_poc.ui.children.ChildrenDetailsFragment"
+        android:label="Child Profile"
+        tools:layout="@layout/fragment_children_details" />
+
+</navigation>
