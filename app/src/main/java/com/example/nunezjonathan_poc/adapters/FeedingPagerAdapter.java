@@ -1,15 +1,13 @@
 package com.example.nunezjonathan_poc.adapters;
 
-import android.content.Context;
-
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentPagerAdapter;
 
-import com.example.nunezjonathan_poc.ui.feeding.BottleFragment;
-import com.example.nunezjonathan_poc.ui.feeding.NurseFragment;
+import com.example.nunezjonathan_poc.ui.fragments.BottleFragment;
+import com.example.nunezjonathan_poc.ui.fragments.NurseFragment;
 
 import java.util.ArrayList;
 import java.util.List;

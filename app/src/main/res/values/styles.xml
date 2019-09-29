@@ -17,4 +17,47 @@
     <style name="MyOverflowButtonStyle" parent="Widget.AppCompat.ActionButton.Overflow">
         <item name="android:tint">@color/textColorPrimary</item>
     </style>
+
+    <style name="InputFields" parent="Widget.AppCompat.EditText">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_marginTop">20dp</item>
+        <item name="android:layout_marginStart">@dimen/activity_horizontal_margin</item>
+        <item name="android:layout_marginEnd">@dimen/activity_horizontal_margin</item>
+    </style>
+
+    <style name="TimerText" parent="Widget.AppCompat.TextView">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:textSize">48sp</item>
+        <item name="android:layout_marginTop">50dp</item>
+    </style>
+
+    <style name="ManualTextButton" parent="Widget.AppCompat.TextView">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:text">@string/manual_entry</item>
+        <item name="android:textSize">24sp</item>
+        <item name="android:clickable">true</item>
+        <item name="android:focusable">true</item>
+    </style>
+
+    <style name="TimerButton" parent="Widget.AppCompat.Button">
+        <item name="android:layout_width">250dp</item>
+        <item name="android:layout_height">250dp</item>
+        <item name="android:textSize">64sp</item>
+        <item name="android:textColor">@color/textColorOnAccent</item>
+        <item name="android:background">@drawable/round_button</item>
+        <item name="android:layout_marginTop">64dp</item>
+    </style>
+
+    <style name="SaveButton" parent="Widget.AppCompat.Button">
+        <item name="android:layout_width">200dp</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:text">@string/save</item>
+        <item name="android:textSize">24sp</item>
+        <item name="android:textColor">#FFFFFF</item>
+        <item name="android:visibility">gone</item>
+        <item name="android:background">@drawable/rectangle_rounded_corners_button</item>
+    </style>
 </resources>

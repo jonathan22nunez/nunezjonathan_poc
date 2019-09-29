@@ -1,4 +1,4 @@
-package com.example.nunezjonathan_poc.ui.overview;
+package com.example.nunezjonathan_poc.ui.fragments;
 
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -8,17 +8,16 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
-import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.fragment.app.Fragment;
 import androidx.fragment.app.ListFragment;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProviders;
 import androidx.navigation.Navigation;
 
 import com.example.nunezjonathan_poc.R;
+import com.example.nunezjonathan_poc.ui.viewModels.OverviewViewModel;
 
 import java.util.ArrayList;
 

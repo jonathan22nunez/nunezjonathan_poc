@@ -1,4 +1,4 @@
-package com.example.nunezjonathan_poc.ui.feeding;
+package com.example.nunezjonathan_poc.ui.fragments;
 
 import android.content.Context;
 import android.os.Bundle;

@@ -1,4 +1,4 @@
-package com.example.nunezjonathan_poc.ui.health;
+package com.example.nunezjonathan_poc.ui.viewModels;
 
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;

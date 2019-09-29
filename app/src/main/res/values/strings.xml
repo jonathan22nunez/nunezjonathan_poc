@@ -4,5 +4,32 @@
     <string name="title_dashboard">Dashboard</string>
     <string name="title_notifications">Notifications</string>
 
+    <!-- Content Descriptions -->
+    <string name="imageView_child_image_desc">Your child\'s profile image.</string>
+
+    <!-- EditText Hints -->
+    <string name="hint_child_name">Name (first name only)</string>
+    <string name="hint_child_dob">Date of Birth</string>
+    <string name="hint_notes">Notes</string>
+
+    <!-- TextView as Buttons -->
     <string name="manual_entry"><u>Manual Entry</u></string>
+    <string name="delete_child_profile"><u>Delete Child Profile</u></string>
+
+    <!-- Spinners -->
+    <string-array name="child_sex_spinner">
+        <item>Select Sex</item>
+        <item>Male</item>
+        <item>Female</item>
+    </string-array>
+    <string name="prompt_sex_spinner">Select a Sex</string>
+
+    <!-- Timer References -->
+    <string name="zeroed_HMS_timer">00:00:00</string>
+    <string name="zeroed_MS_timer">00:00</string>
+
+    <!-- Buttons -->
+    <string name="start">Start</string>
+    <string name="stop">Stop</string>
+    <string name="save">Save</string>
 </resources>

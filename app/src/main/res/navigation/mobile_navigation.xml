@@ -7,7 +7,7 @@
 
     <fragment
         android:id="@+id/navigation_overview"
-        android:name="com.example.nunezjonathan_poc.ui.overview.OverviewFragment"
+        android:name="com.example.nunezjonathan_poc.ui.fragments.OverviewFragment"
         android:label="Daily Overview"
         tools:layout="@layout/fragment_overview">
         <action
@@ -22,7 +22,7 @@
 
     <fragment
         android:id="@+id/navigation_sleep"
-        android:name="com.example.nunezjonathan_poc.ui.sleep.SleepFragment"
+        android:name="com.example.nunezjonathan_poc.ui.fragments.SleepFragment"
         android:label="Sleep"
         tools:layout="@layout/fragment_sleep" >
         <action
@@ -41,13 +41,13 @@
 
     <fragment
         android:id="@+id/navigation_feeding"
-        android:name="com.example.nunezjonathan_poc.ui.feeding.FeedingFragment"
+        android:name="com.example.nunezjonathan_poc.ui.fragments.FeedingFragment"
         android:label="Feeding"
         tools:layout="@layout/fragment_feeding"/>
 
     <fragment
         android:id="@+id/navigation_diaper"
-        android:name="com.example.nunezjonathan_poc.ui.diaper.DiaperFragment"
+        android:name="com.example.nunezjonathan_poc.ui.fragments.DiaperFragment"
         android:label="Diaper"
         tools:layout="@layout/fragment_diaper" >
         <action
@@ -58,7 +58,7 @@
 
     <fragment
         android:id="@+id/navigation_health"
-        android:name="com.example.nunezjonathan_poc.ui.health.HealthFragment"
+        android:name="com.example.nunezjonathan_poc.ui.fragments.HealthFragment"
         android:label="Health"
         tools:layout="@layout/fragment_health" >
         <action
@@ -76,61 +76,61 @@
     </fragment>
     <fragment
         android:id="@+id/navigation_bottle"
-        android:name="com.example.nunezjonathan_poc.ui.feeding.BottleFragment"
+        android:name="com.example.nunezjonathan_poc.ui.fragments.BottleFragment"
         android:label="fragment_bottle"
         tools:layout="@layout/fragment_bottle" />
     <fragment
         android:id="@+id/navigation_nurse"
-        android:name="com.example.nunezjonathan_poc.ui.feeding.NurseFragment"
+        android:name="com.example.nunezjonathan_poc.ui.fragments.NurseFragment"
         android:label="fragment_nurse"
         tools:layout="@layout/fragment_nurse" />
     <fragment
         android:id="@+id/soiledDiaperFragment"
-        android:name="com.example.nunezjonathan_poc.ui.diaper.SoiledDiaperFragment"
+        android:name="com.example.nunezjonathan_poc.ui.fragments.SoiledDiaperFragment"
         android:label="Diaper Details"
         tools:layout="@layout/fragment_soiled_diaper" />
     <fragment
         android:id="@+id/manualSleepFragment"
-        android:name="com.example.nunezjonathan_poc.ui.sleep.ManualSleepFragment"
+        android:name="com.example.nunezjonathan_poc.ui.fragments.ManualSleepFragment"
         android:label="Manual Entry"
         tools:layout="@layout/fragment_manual_sleep_entry" />
     <fragment
         android:id="@+id/sleepLogLIstFragment"
-        android:name="com.example.nunezjonathan_poc.ui.sleep.SleepLogLIstFragment"
+        android:name="com.example.nunezjonathan_poc.ui.fragments.SleepLogLIstFragment"
         android:label="Sleep Log"
         tools:layout="@layout/fragment_sleep_log" />
     <fragment
         android:id="@+id/bottleDetailsFragment"
-        android:name="com.example.nunezjonathan_poc.ui.feeding.BottleDetailsFragment"
+        android:name="com.example.nunezjonathan_poc.ui.fragments.BottleDetailsFragment"
         android:label="Bottle Details"
         tools:layout="@layout/fragment_bottle_details" />
     <fragment
         android:id="@+id/manualBottleFragment"
-        android:name="com.example.nunezjonathan_poc.ui.feeding.ManualBottleFragment"
+        android:name="com.example.nunezjonathan_poc.ui.fragments.ManualBottleFragment"
         android:label="Manual Entry"
         tools:layout="@layout/fragment_manual_bottle_entry" />
     <fragment
         android:id="@+id/symptomFragment"
-        android:name="com.example.nunezjonathan_poc.ui.symptom.SymptomFragment"
+        android:name="com.example.nunezjonathan_poc.ui.fragments.SymptomFragment"
         android:label="Symptom Entry"
         tools:layout="@layout/fragment_symptom" />
     <fragment
         android:id="@+id/medicationFragment"
-        android:name="com.example.nunezjonathan_poc.ui.medication.MedicationFragment"
+        android:name="com.example.nunezjonathan_poc.ui.fragments.MedicationFragment"
         android:label="Medicaiton Entry"
         tools:layout="@layout/fragment_medication" />
     <fragment
         android:id="@+id/temperatureFragment"
-        android:name="com.example.nunezjonathan_poc.ui.temperature.TemperatureFragment"
+        android:name="com.example.nunezjonathan_poc.ui.fragments.TemperatureFragment"
         android:label="Temperature Entry"
         tools:layout="@layout/fragment_temperature" />
     <fragment
         android:id="@+id/settingsFragment"
-        android:name="com.example.nunezjonathan_poc.ui.preferences.SettingsFragment"
+        android:name="com.example.nunezjonathan_poc.ui.fragments.SettingsFragment"
         android:label="Settings" />
     <fragment
         android:id="@+id/childrenListFragment"
-        android:name="com.example.nunezjonathan_poc.ui.children.ChildrenListFragment"
+        android:name="com.example.nunezjonathan_poc.ui.fragments.ChildrenListFragment"
         android:label="Children">
         <action
             android:id="@+id/action_childrenListFragment_to_childrenDetailsFragment"
@@ -142,7 +142,7 @@
     </fragment>
     <fragment
         android:id="@+id/childrenDetailsFragment"
-        android:name="com.example.nunezjonathan_poc.ui.children.ChildrenDetailsFragment"
+        android:name="com.example.nunezjonathan_poc.ui.fragments.ChildrenDetailsFragment"
         android:label="Child Profile"
         tools:layout="@layout/fragment_children_details" />
 

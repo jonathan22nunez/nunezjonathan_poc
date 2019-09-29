@@ -1,4 +1,4 @@
-package com.example.nunezjonathan_poc.ui.medication;
+package com.example.nunezjonathan_poc.ui.fragments;
 
 import android.os.Bundle;
 import android.view.LayoutInflater;

@@ -4,43 +4,52 @@
     android:layout_height="match_parent">
 
     <ImageView
+        android:id="@+id/imageView_child_image"
         android:layout_width="match_parent"
         android:layout_height="200dp"
         android:src="@drawable/ic_add_24dp"
-        android:background="#DDDDDD"/>
+        android:background="#DDDDDD"
+        android:contentDescription="@string/imageView_child_image_desc"/>
 
     <EditText
         android:id="@+id/editText_child_name"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:hint="Name"
-        android:layout_marginTop="20dp"/>
+        style="@style/InputFields"
+        android:hint="@string/hint_child_name"
+        android:autofillHints="no"
+        android:inputType="textPersonName"/>
 
     <EditText
         android:id="@+id/editText_child_dob"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:hint="Date of Birth"
-        android:layout_marginTop="20dp"/>
+        style="@style/InputFields"
+        android:hint="@string/hint_child_dob"
+        android:autofillHints="no"
+        android:clickable="true"
+        android:focusable="false"
+        android:inputType="datetime"/>
 
     <Spinner
+        android:id="@+id/spinner_child_sex"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="20dp"/>
+        android:prompt="@string/prompt_sex_spinner"
+        android:layout_marginTop="20dp"
+        android:layout_marginStart="@dimen/activity_horizontal_margin"
+        android:layout_marginEnd="@dimen/activity_horizontal_margin"/>
 
     <EditText
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:hint="Notes"
+        android:id="@+id/editText_child_notes"
+        style="@style/InputFields"
+        android:hint="@string/hint_notes"
+        android:autofillHints="no"
+        android:inputType="text"
         android:gravity="top"
-        android:lines="3"
-        android:layout_marginTop="20dp"/>
+        android:lines="3"/>
 
     <TextView
         android:id="@+id/textView_delete_child_profile"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Delete Child Profile"
+        android:text="@string/delete_child_profile"
         android:textSize="18sp"
         android:visibility="gone"
         android:clickable="true"

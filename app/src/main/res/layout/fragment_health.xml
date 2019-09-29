@@ -3,7 +3,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:layout_marginBottom="56dp">
+    android:layout_marginBottom="@dimen/bottom_nav_margin">
 
     <TextView
         android:id="@+id/textView_current_symptom_details"
