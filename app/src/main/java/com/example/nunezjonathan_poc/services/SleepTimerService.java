@@ -9,31 +9,26 @@ import android.content.Intent;
 import android.os.Build;
 import android.os.Handler;
 import android.os.IBinder;
-import android.util.Log;
-import android.util.TimeUtils;
 
 import androidx.annotation.Nullable;
 import androidx.core.app.NotificationCompat;
 
 import com.example.nunezjonathan_poc.R;
 import com.example.nunezjonathan_poc.ui.activities.MainActivity;
-import com.example.nunezjonathan_poc.utils.TimerUtils;
-
-import java.util.Locale;
-import java.util.concurrent.TimeUnit;
+import com.example.nunezjonathan_poc.utils.TimeUtils;
 
 public class SleepTimerService extends Service {
 
-    public static final String CHANNEL_ID = "SleepTimerServiceChannel";
+    private static final String CHANNEL_ID = "SleepTimerServiceChannel";
     public static final String EXTRA_TIME_MILLIS = "com.example.nunezjonathan_poc.EXTRA_TIME_MILLIS";
-    public static final String ACTION_UPDATE_TIMER = "com.example.nunezjonathan_poc.UPDATE_TIMER";
+    public static final String ACTION_UPDATE_TIMER = "com.example.nunezjonathan_poc.UPDATE_SLEEP_TIMER";
 
     public static boolean isRunning = false;
 
     private NotificationCompat.Builder notificationBuilder;
     private NotificationManager notificationManager;
 
-    private Intent receiverIntent = new Intent(ACTION_UPDATE_TIMER);
+    private final Intent receiverIntent = new Intent(ACTION_UPDATE_TIMER);
     private long millis;
 
     @Override
@@ -55,8 +50,8 @@ public class SleepTimerService extends Service {
         return START_NOT_STICKY;
     }
 
-    Handler handler = new Handler();
-    Runnable runnable = new Runnable() {
+    private final Handler handler = new Handler();
+    private final Runnable runnable = new Runnable() {
         @Override
         public void run() {
             millis += 1000;
@@ -64,7 +59,7 @@ public class SleepTimerService extends Service {
             receiverIntent.putExtra(EXTRA_TIME_MILLIS, millis);
             sendBroadcast(receiverIntent);
 
-            notificationBuilder.setContentText(TimerUtils.timerHMS(millis));
+            notificationBuilder.setContentText(TimeUtils.timerHMS(millis));
 
             notificationManager.notify(1, notificationBuilder.build());
 

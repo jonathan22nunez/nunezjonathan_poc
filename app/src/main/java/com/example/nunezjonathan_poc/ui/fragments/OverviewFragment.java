@@ -1,5 +1,6 @@
 package com.example.nunezjonathan_poc.ui.fragments;
 
+import android.content.Context;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -17,20 +18,57 @@ import androidx.lifecycle.ViewModelProviders;
 import androidx.navigation.Navigation;
 
 import com.example.nunezjonathan_poc.R;
+import com.example.nunezjonathan_poc.adapters.NurseListAdapter;
+import com.example.nunezjonathan_poc.databases.FirestoreDatabase;
+import com.example.nunezjonathan_poc.models.Event;
+import com.example.nunezjonathan_poc.ui.viewModels.EventViewModel;
+import com.example.nunezjonathan_poc.ui.viewModels.FirestoreViewModel;
 import com.example.nunezjonathan_poc.ui.viewModels.OverviewViewModel;
+import com.example.nunezjonathan_poc.utils.OptionalServices;
 
 import java.util.ArrayList;
+import java.util.List;
 
 public class OverviewFragment extends ListFragment {
-
-    private OverviewViewModel overviewViewModel;
 
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         setHasOptionsMenu(true);
-        overviewViewModel = ViewModelProviders.of(this).get(OverviewViewModel.class);
-        return inflater.inflate(R.layout.fragment_overview, container, false);
+        View root = inflater.inflate(R.layout.fragment_overview, container, false);
+        if (OptionalServices.cloudSyncEnabled(getContext())) {
+            FirestoreViewModel firestoreViewModel = ViewModelProviders.of(this).get(FirestoreViewModel.class);
+            if (getContext() != null) {
+                long childId = getContext().getSharedPreferences("currentChild",
+                        Context.MODE_PRIVATE).getLong("childId", -1);
+                if (childId != -1) {
+                    firestoreViewModel.getAllEventsList(FirestoreDatabase.getCurrentUser().getUid(), childId).observe(this, new Observer<List<Event>>() {
+                        @Override
+                        public void onChanged(List<Event> events) {
+                            if (getContext() != null) {
+                                ArrayAdapter<Event> adapter = new ArrayAdapter<>(getContext(), android.R.layout.simple_list_item_1, events);
+                                setListAdapter(adapter);
+                            }
+                        }
+                    });
+                }
+            }
+        } else {
+            OverviewViewModel overviewViewModel = ViewModelProviders.of(this).get(OverviewViewModel.class);
+            if (overviewViewModel.getOverviewList() != null) {
+                overviewViewModel.getOverviewList().observe(this, new Observer<List<Event>>() {
+                    @Override
+                    public void onChanged(List<Event> events) {
+                        if (getContext() != null) {
+                            ArrayAdapter<Event> adapter = new ArrayAdapter<>(getContext(), android.R.layout.simple_list_item_1, events);
+                            setListAdapter(adapter);
+                        }
+                    }
+                });
+            }
+        }
+
+        return root;
     }
 
     @Override
@@ -38,22 +76,6 @@ public class OverviewFragment extends ListFragment {
         super.onCreateOptionsMenu(menu, inflater);
 
         inflater.inflate(R.menu.overview_menu, menu);
-    }
-
-    @Override
-    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
-        super.onActivityCreated(savedInstanceState);
-
-        overviewViewModel.getArrayList().observe(this, new Observer<ArrayList<String>>() {
-            @Override
-            public void onChanged(ArrayList<String> strings) {
-                if (getContext() != null) {
-                    ArrayAdapter<String> adapter = new ArrayAdapter<>(getContext(), android.R.layout.simple_list_item_1, strings);
-                    setListAdapter(adapter);
-                }
-            }
-        });
-
     }
 
     @Override

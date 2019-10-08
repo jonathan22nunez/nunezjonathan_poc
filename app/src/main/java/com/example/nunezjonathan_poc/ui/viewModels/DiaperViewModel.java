@@ -1,17 +1,32 @@
 package com.example.nunezjonathan_poc.ui.viewModels;
 
+import android.app.Application;
+
+import androidx.annotation.NonNull;
+import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.LiveData;
-import androidx.lifecycle.MutableLiveData;
-import androidx.lifecycle.ViewModel;
 
-public class DiaperViewModel extends ViewModel {
+import com.example.nunezjonathan_poc.models.Event;
+import com.example.nunezjonathan_poc.repos.DiaperRepository;
 
-    private MutableLiveData<String> mText;
+import java.util.List;
 
-    public DiaperViewModel() {
-        mText = new MutableLiveData<>();
-        mText.setValue("My Diaper Screen");
+public class DiaperViewModel extends AndroidViewModel {
+
+    private final DiaperRepository mRepository;
+    private final LiveData<List<Event>> diaperList;
+
+    public DiaperViewModel(@NonNull Application application) {
+        super(application);
+        mRepository = new DiaperRepository(application);
+        diaperList = mRepository.getDiaperList();
     }
 
-    public LiveData<String> getText() { return mText; }
+    public LiveData<List<Event>> getDiaperList() {
+        return diaperList;
+    }
+
+    public void insertDiaperEvent(Event event) {
+        mRepository.insertDiaperEvent(event);
+    }
 }

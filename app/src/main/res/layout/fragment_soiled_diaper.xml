@@ -1,97 +1,125 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical" android:layout_width="match_parent"
-    android:layout_height="match_parent">
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:layout_marginStart="@dimen/activity_horizontal_margin"
+    android:layout_marginEnd="@dimen/activity_horizontal_margin"
+    android:layout_marginBottom="@dimen/bottom_nav_margin">
 
     <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="09/20/19"
-        android:textSize="24sp"
-        android:layout_gravity="center"
-        android:layout_marginTop="20dp"/>
+        android:id="@+id/textView_color_label"
+        style="@style/InputFieldLabel"
+        android:text="@string/inputLabel_color"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent"/>
+
+    <ImageView
+        android:id="@+id/imageView_color_black"
+        android:layout_width="36dp"
+        android:layout_height="36dp"
+        android:src="@drawable/black_poo"
+        app:layout_constraintTop_toTopOf="@id/imageView_color_yellow"
+        app:layout_constraintEnd_toStartOf="@id/imageView_color_yellow"
+        android:layout_marginEnd="64dp"/>
+
+    <ImageView
+        android:id="@+id/imageView_color_yellow"
+        android:layout_width="36dp"
+        android:layout_height="36dp"
+        android:src="@drawable/yellow_poo"
+        app:layout_constraintTop_toBottomOf="@id/textView_color_label"
+        android:layout_marginTop="40dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"/>
+
+    <ImageView
+        android:id="@+id/imageView_color_brown"
+        android:layout_width="36dp"
+        android:layout_height="36dp"
+        android:src="@drawable/brown_poo"
+        app:layout_constraintTop_toTopOf="@id/imageView_color_yellow"
+        app:layout_constraintStart_toEndOf="@id/imageView_color_yellow"
+        android:layout_marginStart="64dp"/>
+
+    <ImageView
+        android:id="@+id/imageView_color_green"
+        android:layout_width="36dp"
+        android:layout_height="36dp"
+        android:src="@drawable/green_poo"
+        app:layout_constraintTop_toTopOf="@id/imageView_color_orange"
+        app:layout_constraintEnd_toStartOf="@id/imageView_color_orange"
+        android:layout_marginEnd="64dp"/>
+
+    <ImageView
+        android:id="@+id/imageView_color_orange"
+        android:layout_width="36dp"
+        android:layout_height="36dp"
+        android:src="@drawable/orange_poo"
+        app:layout_constraintTop_toBottomOf="@id/imageView_color_yellow"
+        android:layout_marginTop="40dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"/>
+
+    <ImageView
+        android:id="@+id/imageView_color_red"
+        android:layout_width="36dp"
+        android:layout_height="36dp"
+        android:src="@drawable/red_poo"
+        app:layout_constraintTop_toTopOf="@id/imageView_color_orange"
+        app:layout_constraintStart_toEndOf="@id/imageView_color_orange"
+        android:layout_marginStart="64dp"/>
 
     <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Color"
-        android:textSize="24sp"
-        android:layout_marginBottom="20dp"/>
-
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:layout_marginBottom="20dp">
-
-        <TextView
-            android:layout_weight="0.33"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:text="Color 1"
-            android:gravity="center"/>
-
-        <TextView
-            android:layout_weight="0.33"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:text="Color 2"
-            android:gravity="center"/>
-
-        <TextView
-            android:layout_weight="0.33"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:text="Color 3"
-            android:gravity="center"/>
-    </LinearLayout>
-
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:layout_marginBottom="20dp">
-
-        <TextView
-            android:layout_weight="0.33"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:text="Color 4"
-            android:gravity="center"/>
-
-        <TextView
-            android:layout_weight="0.33"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:text="Color 5"
-            android:gravity="center"/>
-
-        <TextView
-            android:layout_weight="0.33"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:text="Color 6"
-            android:gravity="center"/>
-    </LinearLayout>
-
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Hardness"
-        android:textSize="24sp"
-        android:layout_marginBottom="20dp"/>
+        android:id="@+id/textView_hardness_label"
+        style="@style/InputFieldLabel"
+        android:text="@string/inputLabel_hardness"
+        app:layout_constraintTop_toBottomOf="@id/imageView_color_orange"
+        android:layout_marginTop="40dp"
+        app:layout_constraintStart_toStartOf="parent"/>
 
     <SeekBar
+        android:id="@+id/seekbar_hardness"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="20dp"/>
+        android:max="2"
+        android:progress="1"
+        app:layout_constraintTop_toBottomOf="@id/textView_hardness_label"
+        android:layout_marginTop="40dp"/>
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/inputLabel_loose"
+        app:layout_constraintTop_toBottomOf="@id/seekbar_hardness"
+        android:layout_marginTop="8dp"
+        app:layout_constraintStart_toStartOf="@id/seekbar_hardness"/>
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/inputLabel_soft"
+        app:layout_constraintTop_toBottomOf="@id/seekbar_hardness"
+        android:layout_marginTop="8dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"/>
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/inputLabel_hard"
+        app:layout_constraintTop_toBottomOf="@id/seekbar_hardness"
+        android:layout_marginTop="8dp"
+        app:layout_constraintEnd_toEndOf="@id/seekbar_hardness"/>
 
     <Button
         android:id="@+id/button_save_soiled_diaper"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Save"
-        android:textSize="24sp"
-        android:layout_gravity="center"/>
+        style="@style/SaveButton"
+        android:visibility="visible"
+        app:layout_constraintTop_toBottomOf="@id/seekbar_hardness"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent" />
 
-</LinearLayout>
+</androidx.constraintlayout.widget.ConstraintLayout>

@@ -14,6 +14,9 @@ import java.util.List;
 public interface ChildDao {
 
     @Query("SELECT * FROM children")
+    List<Child> queryAllForConvert();
+
+    @Query("SELECT * FROM children")
     LiveData<List<Child>> queryAll();
 
     @Query("SELECT * FROM children WHERE _id IN (:childIds)")
@@ -29,8 +32,5 @@ public interface ChildDao {
     void insertAll(Child... children);
 
     @Delete
-    void delete(Child child);
-
-    @Delete
-    void deleteAll(Child... children);
+    int delete(Child... children);
 }

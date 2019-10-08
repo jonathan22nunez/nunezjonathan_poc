@@ -2,7 +2,6 @@ package com.example.nunezjonathan_poc.interfaces;
 
 import android.content.Context;
 import android.graphics.Canvas;
-import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.PorterDuff;
 import android.graphics.PorterDuffXfermode;
@@ -19,11 +18,11 @@ import com.example.nunezjonathan_poc.R;
 
 public abstract class SwipeToDeleteCallback extends ItemTouchHelper.Callback {
 
-    Context mContext;
-    private Paint mClearPaint;
-    private ColorDrawable mBackground;
-    private int backgroundColor;
-    private Drawable deleteDrawable;
+    final Context mContext;
+    private final Paint mClearPaint;
+    private final ColorDrawable mBackground;
+    private final int backgroundColor;
+    private final Drawable deleteDrawable;
     private int intrinsicWidth;
     private int intrinsicHeight;
 

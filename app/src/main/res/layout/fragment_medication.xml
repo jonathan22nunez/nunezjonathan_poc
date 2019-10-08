@@ -1,70 +1,96 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical" android:layout_width="match_parent"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:layout_marginBottom="56dp">
+    android:layout_marginStart="@dimen/activity_horizontal_margin"
+    android:layout_marginEnd="@dimen/activity_horizontal_margin"
+    android:layout_marginBottom="@dimen/bottom_nav_margin">
 
     <TextView
-        android:id="@+id/textView_medication_datetime"
+        android:id="@+id/textView_date"
+        style="@style/DateText"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintEnd_toStartOf="@id/guideline"
+        android:layout_marginEnd="40dp"/>
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/guideline"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="09/20/19 11:00 AM"
-        android:textSize="24sp"
-        android:layout_gravity="center"
-        android:layout_marginTop="20dp"/>
+        app:layout_constraintGuide_percent="0.5"
+        android:orientation="vertical"/>
+
+    <TextView
+        android:id="@+id/textView_time"
+        style="@style/DateText"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="@id/guideline"
+        android:layout_marginStart="40dp"/>
 
     <EditText
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:hint="Drug Name"
-        android:layout_marginTop="20dp"/>
+        android:id="@+id/editText_drug_name"
+        style="@style/InputFields"
+        android:hint="@string/hint_drug_name"
+        app:layout_constraintTop_toBottomOf="@id/textView_date"
+        app:layout_constraintStart_toStartOf="parent"/>
 
     <EditText
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:hint="Brand Name"
-        android:layout_marginTop="20dp"/>
+        android:id="@+id/editText_brand_name"
+        style="@style/InputFields"
+        android:hint="@string/hint_brand_name"
+        app:layout_constraintTop_toBottomOf="@id/editText_drug_name"
+        android:layout_marginTop="20dp"
+        app:layout_constraintStart_toStartOf="parent"/>
 
     <LinearLayout
+        android:id="@+id/layout_dosage"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="20dp">
+        android:layout_marginTop="20dp"
+        app:layout_constraintTop_toBottomOf="@id/editText_brand_name">
 
         <EditText
+            android:id="@+id/editText_dosage"
             android:layout_weight="0.5"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:hint="Dosage"/>
+            android:hint="@string/hint_dosage"
+            android:inputType="numberDecimal"/>
 
         <Spinner
+            android:id="@+id/spinner_unit"
             android:layout_weight="0.5"
             android:layout_width="0dp"
-            android:layout_height="wrap_content"/>
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"/>
 
     </LinearLayout>
 
     <EditText
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:hint="Next Dosage Time"
-        android:layout_marginTop="20dp"/>
+        android:id="@+id/editText_next_dosage"
+        style="@style/InputFields"
+        android:hint="@string/hint_next_dosage_time"
+        app:layout_constraintTop_toBottomOf="@id/layout_dosage"
+        app:layout_constraintStart_toStartOf="parent"/>
 
     <EditText
+        android:id="@+id/editText_notes"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:hint="Notes"
+        android:hint="@string/hint_notes"
         android:gravity="top"
         android:lines="5"
-        android:layout_marginTop="20dp"/>
+        android:layout_marginTop="20dp"
+        app:layout_constraintTop_toBottomOf="@id/editText_next_dosage"/>
 
     <Button
-        android:id="@+id/button_save_symptom"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Save"
-        android:textColor="#FFFFFF"
-        android:background="#aedec9"
-        android:layout_gravity="center"
-        android:layout_marginTop="24dp"/>
+        android:id="@+id/button_save_medication"
+        style="@style/SaveButton"
+        android:visibility="visible"
+        app:layout_constraintTop_toBottomOf="@id/editText_notes"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"/>
 
-</LinearLayout>
+</androidx.constraintlayout.widget.ConstraintLayout>

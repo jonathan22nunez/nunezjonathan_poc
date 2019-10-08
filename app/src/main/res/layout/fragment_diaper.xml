@@ -2,25 +2,45 @@
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    xmlns:app="http://schemas.android.com/apk/res-auto">
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_marginStart="@dimen/activity_horizontal_margin"
+    android:layout_marginEnd="@dimen/activity_horizontal_margin"
+    android:layout_marginBottom="@dimen/bottom_nav_margin">
+
+    <TextView
+        android:id="@+id/textView_date"
+        style="@style/DateText"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintEnd_toStartOf="@id/guideline"
+        android:layout_marginEnd="40dp"/>
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/guideline"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintGuide_percent="0.5"
+        android:orientation="vertical"/>
+
+    <TextView
+        android:id="@+id/textView_time"
+        style="@style/DateText"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="@id/guideline"
+        android:layout_marginStart="40dp"/>
 
     <TextView
         android:id="@+id/textView_wet_activity"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Wet"
-        android:textSize="28sp"
+        style="@style/TextButton"
+        android:text="@string/wet"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintBottom_toTopOf="@id/textView_poopy_activity"
-        android:layout_marginBottom="100dp"/>
+        android:layout_marginBottom="75dp"/>
 
     <TextView
         android:id="@+id/textView_poopy_activity"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Poopy"
-        android:textSize="28sp"
+        style="@style/TextButton"
+        android:text="@string/poopy"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
@@ -28,12 +48,10 @@
 
     <TextView
         android:id="@+id/textView_mixed_activity"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Mixed"
-        android:textSize="28sp"
+        style="@style/TextButton"
+        android:text="@string/mixed"
         app:layout_constraintTop_toBottomOf="@id/textView_poopy_activity"
-        android:layout_marginTop="100dp"
+        android:layout_marginTop="75dp"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"/>
 

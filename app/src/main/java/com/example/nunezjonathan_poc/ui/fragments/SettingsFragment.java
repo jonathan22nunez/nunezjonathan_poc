@@ -1,36 +1,29 @@
 package com.example.nunezjonathan_poc.ui.fragments;
 
 import android.app.AlertDialog;
-import android.content.Context;
+import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.util.Log;
 
-import androidx.annotation.NonNull;
 import androidx.preference.Preference;
 import androidx.preference.PreferenceFragmentCompat;
 import androidx.preference.SwitchPreference;
 
 import com.example.nunezjonathan_poc.R;
+import com.example.nunezjonathan_poc.databases.FirestoreDatabase;
+import com.example.nunezjonathan_poc.services.ConvertToCloudService;
+import com.example.nunezjonathan_poc.utils.OptionalServices;
 
 public class SettingsFragment extends PreferenceFragmentCompat implements SharedPreferences.OnSharedPreferenceChangeListener {
 
-    public interface SettingsListener {
-        void signOut();
-    }
-
-    private SettingsListener mListener;
-    SwitchPreference cloudSyncEnabled;
-    Preference syncDevices, backupData, restoreData, signOut, deleteAll;
-
-    @Override
-    public void onAttach(@NonNull Context context) {
-        super.onAttach(context);
-
-        if (context instanceof SettingsListener) {
-            mListener = (SettingsListener) context;
-        }
-    }
+    private SwitchPreference cloudSyncEnabled;
+    private Preference syncDevices;
+    private Preference backupData;
+    private Preference restoreData;
+    private Preference signOut;
+    private Preference deleteAll;
 
     @Override
     public void onCreatePreferences(Bundle savedInstanceState, String rootKey) {
@@ -52,7 +45,7 @@ public class SettingsFragment extends PreferenceFragmentCompat implements Shared
         signOut.setEnabled(enableStatus);
         deleteAll.setEnabled(enableStatus);
 
-        if (cloudSyncEnabled.isEnabled()) {
+        if (cloudSyncEnabled.isEnabled() && FirestoreDatabase.getCurrentUser() != null) {
             enableStatus = getPreferenceManager().getSharedPreferences().getBoolean("cloudSyncEnabled", false);
             syncDevices.setEnabled(enableStatus);
             backupData.setEnabled(enableStatus);
@@ -86,11 +79,17 @@ public class SettingsFragment extends PreferenceFragmentCompat implements Shared
                 AlertDialog alertDialog = builder.create();
                 alertDialog.show();
             }
-            cloudSyncEnabled.setEnabled(enableStatus);
-            signOut.setEnabled(enableStatus);
-            deleteAll.setEnabled(enableStatus);
+            if (FirestoreDatabase.getCurrentUser() != null) {
+                cloudSyncEnabled.setEnabled(enableStatus);
+                signOut.setEnabled(enableStatus);
+                deleteAll.setEnabled(enableStatus);
+            }
         } else if (key.equals("cloudSyncEnabled")) {
             boolean enableStatus = sharedPreferences.getBoolean(key, false);
+            if (enableStatus) {
+                Intent intent = new Intent(getActivity(), ConvertToCloudService.class);
+                ConvertToCloudService.enqueueWork(getContext(), intent);
+            }
             syncDevices.setEnabled(enableStatus);
             backupData.setEnabled(enableStatus);
             restoreData.setEnabled(enableStatus);
@@ -110,7 +109,7 @@ public class SettingsFragment extends PreferenceFragmentCompat implements Shared
                 Log.i("SettingsPreference", "Restore Data Clicked");
                 break;
             case "signOut":
-                mListener.signOut();
+                OptionalServices.signOut(getContext());
                 break;
             case "deleteAll":
                 Log.i("SettingsPreference", "Delete All Clicked");

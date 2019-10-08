@@ -2,7 +2,6 @@ package com.example.nunezjonathan_poc.ui.fragments;
 
 import android.content.Context;
 import android.content.SharedPreferences;
-import android.graphics.Color;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -10,17 +9,11 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AbsListView;
-import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
-import android.widget.ListView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.coordinatorlayout.widget.CoordinatorLayout;
 import androidx.fragment.app.Fragment;
-import androidx.fragment.app.ListFragment;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProviders;
 import androidx.navigation.Navigation;
@@ -32,11 +25,7 @@ import com.example.nunezjonathan_poc.adapters.ChildRecyclerAdapter;
 import com.example.nunezjonathan_poc.interfaces.ItemClickListener;
 import com.example.nunezjonathan_poc.interfaces.SwipeToDeleteCallback;
 import com.example.nunezjonathan_poc.models.Child;
-import com.example.nunezjonathan_poc.ui.viewModels.DatabaseViewModel;
-import com.google.android.gms.common.util.SharedPreferencesUtils;
-import com.google.android.material.snackbar.Snackbar;
-import com.hudomju.swipe.SwipeToDismissTouchListener;
-import com.hudomju.swipe.adapter.ListViewAdapter;
+import com.example.nunezjonathan_poc.ui.viewModels.ChildrenViewModel;
 
 import java.util.List;
 
@@ -51,8 +40,8 @@ public class ChildrenListFragment extends Fragment implements ItemClickListener 
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         setHasOptionsMenu(true);
         final View root = inflater.inflate(R.layout.fragment_children_test, container, false);
-        DatabaseViewModel databaseViewModel = ViewModelProviders.of(this).get(DatabaseViewModel.class);
-        databaseViewModel.getChildrenListLiveData().observe(this, new Observer<List<Child>>() {
+        ChildrenViewModel childrenViewModel = ViewModelProviders.of(this).get(ChildrenViewModel.class);
+        childrenViewModel.getChildren().observe(this, new Observer<List<Child>>() {
             @Override
             public void onChanged(List<Child> children) {
                 mChildren = children;
@@ -61,6 +50,7 @@ public class ChildrenListFragment extends Fragment implements ItemClickListener 
                 recyclerView.setAdapter(recyclerAdapter);
             }
         });
+
         return root;
     }
 
@@ -109,7 +99,10 @@ public class ChildrenListFragment extends Fragment implements ItemClickListener 
     @Override
     public void onClick(View view, int position) {
         if (getActivity() != null) {
-            mChildren.get(position).makeCurrentlySelected(getActivity());
+            SharedPreferences sharedPrefs = getActivity().getSharedPreferences("currentChild", Context.MODE_PRIVATE);
+            sharedPrefs.edit().putLong("childId", (long) mChildren.get(position)._id).apply();
+
+            Toast.makeText(getContext(), "Current Child is now " + mChildren.get(position).name, Toast.LENGTH_SHORT).show();
         }
     }
 }

@@ -22,8 +22,27 @@
         <item name="android:layout_width">match_parent</item>
         <item name="android:layout_height">wrap_content</item>
         <item name="android:layout_marginTop">20dp</item>
-        <item name="android:layout_marginStart">@dimen/activity_horizontal_margin</item>
-        <item name="android:layout_marginEnd">@dimen/activity_horizontal_margin</item>
+    </style>
+
+    <style name="InputFields.Ounces" parent="Widget.AppCompat.TextView">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:text">@string/zeroed_ounces</item>
+        <item name="android:textSize">32sp</item>
+    </style>
+
+    <style name="InputFields.Temperature" parent="Widget.AppCompat.TextView">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:text">98.6 F</item>
+        <item name="android:textSize">32sp</item>
+    </style>
+
+    <style name="InputFieldLabel" parent="Widget.AppCompat.TextView">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:textSize">18sp</item>
+        <item name="android:layout_marginTop">20dp</item>
     </style>
 
     <style name="TimerText" parent="Widget.AppCompat.TextView">
@@ -33,11 +52,29 @@
         <item name="android:layout_marginTop">50dp</item>
     </style>
 
+    <style name="DateText" parent="Widget.AppCompat.TextView">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:textSize">24sp</item>
+        <item name="android:clickable">true</item>
+        <item name="android:focusable">false</item>
+        <item name="android:layout_marginTop">20dp</item>
+        <item name="android:layout_marginBottom">40dp</item>
+    </style>
+
     <style name="ManualTextButton" parent="Widget.AppCompat.TextView">
         <item name="android:layout_width">wrap_content</item>
         <item name="android:layout_height">wrap_content</item>
         <item name="android:text">@string/manual_entry</item>
         <item name="android:textSize">24sp</item>
+        <item name="android:clickable">true</item>
+        <item name="android:focusable">true</item>
+    </style>
+
+    <style name="TextButton" parent="Widget.AppCompat.TextView">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:textSize">28sp</item>
         <item name="android:clickable">true</item>
         <item name="android:focusable">true</item>
     </style>
@@ -51,6 +88,21 @@
         <item name="android:layout_marginTop">64dp</item>
     </style>
 
+    <style name="DualTimerButton" parent="Widget.AppCompat.Button">
+        <item name="android:layout_width">150dp</item>
+        <item name="android:layout_height">150dp</item>
+        <item name="android:textSize">48sp</item>
+        <item name="android:textColor">@color/textColorOnAccent</item>
+        <item name="android:background">@drawable/round_button</item>
+    </style>
+
+    <style name="Indicator">
+        <item name="android:layout_width">18dp</item>
+        <item name="android:layout_height">18dp</item>
+        <item name="android:src">@drawable/round_button</item>
+        <item name="android:visibility">invisible</item>
+    </style>
+
     <style name="SaveButton" parent="Widget.AppCompat.Button">
         <item name="android:layout_width">200dp</item>
         <item name="android:layout_height">wrap_content</item>
@@ -58,6 +110,18 @@
         <item name="android:textSize">24sp</item>
         <item name="android:textColor">#FFFFFF</item>
         <item name="android:visibility">gone</item>
-        <item name="android:background">@drawable/rectangle_rounded_corners_button</item>
+        <item name="android:background">@drawable/green_rounded_corners_button</item>
+    </style>
+
+    <style name="SaveButton.Finish">
+        <item name="android:text">@string/finish</item>
+        <item name="android:textColor">@color/textColorPrimary</item>
+        <item name="android:background">@drawable/yellow_rounded_corners_button</item>
+    </style>
+
+    <style name="TimePicker">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">150dp</item>
+        <item name="android:timePickerMode">spinner</item>
     </style>
 </resources>

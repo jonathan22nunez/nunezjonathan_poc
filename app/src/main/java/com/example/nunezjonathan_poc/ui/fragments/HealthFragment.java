@@ -8,30 +8,79 @@ import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
+import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProviders;
 import androidx.navigation.Navigation;
 
 import com.example.nunezjonathan_poc.R;
+import com.example.nunezjonathan_poc.models.Health;
 import com.example.nunezjonathan_poc.ui.viewModels.HealthViewModel;
+import com.example.nunezjonathan_poc.utils.CalendarUtils;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
 
 public class HealthFragment extends Fragment {
 
-    private HealthViewModel healthViewModel;
     private FloatingActionButton fab_add_health, fab_add_symptom, fab_add_medication, fab_add_temperature;
     private Animation fab_open, fab_close, fab_rotate_clockwise, fab_rotate_counterclockwise;
     private boolean fabIsOpen = false;
+    private ListView healthListView;
+    private List<Health> healthList;
+    private TextView lastTemp;
+    private TextView lastMedication;
 
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        healthViewModel = ViewModelProviders.of(this).get(HealthViewModel.class);
+        setHasOptionsMenu(true);
+        HealthViewModel healthViewModel = ViewModelProviders.of(this).get(HealthViewModel.class);
+        if (healthViewModel.getHealthList() != null) {
+            healthViewModel.getHealthList().observe(this, new Observer<List<Health>>() {
+                @Override
+                public void onChanged(List<Health> health) {
+                    healthList = health;
+                    if (getContext() != null) {
+                        Collections.sort(healthList, new Comparator<Health>() {
+                            @Override
+                            public int compare(Health o1, Health o2) {
+                                Calendar o1Datetime = CalendarUtils.stringToCalendar(o1.datetime);
+                                Calendar o2Datetime = CalendarUtils.stringToCalendar(o2.datetime);
+                                return o2Datetime.compareTo(o1Datetime);
+                            }
+                        });
+                        ArrayAdapter<Health> adapter = new ArrayAdapter<>(getContext(), android.R.layout.simple_list_item_1, healthList);
+                        healthListView.setAdapter(adapter);
+
+                        for (Health h :
+                                healthList) {
+                            if (h.healthType == Health.HealthType.TEMPERATURE) {
+                                String temperature = h.temperature + "F";
+                                lastTemp.setText(temperature);
+                                break;
+                            }
+                        }
+
+                        for (Health h :
+                                healthList) {
+                            if (h.healthType == Health.HealthType.MEDICATION) {
+                                lastMedication.setText(h.toString());
+                                break;
+                            }
+                        }
+                    }
+                }
+            });
+        }
 
         return inflater.inflate(R.layout.fragment_health, container, false);
     }
@@ -50,6 +99,9 @@ public class HealthFragment extends Fragment {
         super.onViewCreated(view, savedInstanceState);
 
         if (getActivity() != null) {
+            lastTemp = view.findViewById(R.id.textView_last_temp);
+            lastMedication = view.findViewById(R.id.textView_last_medication);
+
             fab_open = AnimationUtils.loadAnimation(getActivity().getApplicationContext(), R.anim.fab_open);
             fab_close = AnimationUtils.loadAnimation(getActivity().getApplicationContext(), R.anim.fab_close);
             fab_rotate_clockwise = AnimationUtils.loadAnimation(getActivity().getApplicationContext(), R.anim.fab_rotate_clockwise);
@@ -85,17 +137,7 @@ public class HealthFragment extends Fragment {
                 }
             });
 
-            ListView healthListView = view.findViewById(R.id.listView_health);
-            ArrayList<String> stringArrayList = new ArrayList<String>(){{
-                add("Itchy throat - 12:00 PM");
-                add("Took [medicine name] at 11:45 AM");
-                add("Temp. 100.0 F at 11:30 AM");
-                add("Head felt warm - 11:00 AM");
-            }};
-            if (getContext() != null) {
-                ArrayAdapter<String> adapter = new ArrayAdapter<>(getContext(), android.R.layout.simple_list_item_1, stringArrayList);
-                healthListView.setAdapter(adapter);
-            }
+            healthListView = view.findViewById(R.id.listView_health);
 
             fab_add_symptom.setOnClickListener(new View.OnClickListener() {
                 @Override

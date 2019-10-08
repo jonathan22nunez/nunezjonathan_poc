@@ -3,7 +3,8 @@ package com.example.nunezjonathan_poc.adapters;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AdapterView;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -17,14 +18,16 @@ import java.util.List;
 
 public class ChildRecyclerAdapter extends RecyclerView.Adapter<ChildRecyclerAdapter.ChildViewHolder> {
 
-    private List<Child> children;
+    private final List<Child> children;
     private ItemClickListener itemClickListener;
+    private int lastPosition = -1;
 
     public class ChildViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
 
-        private TextView childName, childDob;
+        private final TextView childName;
+        private final TextView childDob;
 
-        public ChildViewHolder(@NonNull View itemView) {
+        ChildViewHolder(@NonNull View itemView) {
             super(itemView);
 
             childName = itemView.findViewById(R.id.textView_childName);
@@ -57,6 +60,8 @@ public class ChildRecyclerAdapter extends RecyclerView.Adapter<ChildRecyclerAdap
         holder.childName.setText(children.get(position).name);
         holder.childDob.setText(children.get(position).dob);
 
+        setAnimation(holder.itemView, position);
+
     }
 
     @Override
@@ -66,6 +71,14 @@ public class ChildRecyclerAdapter extends RecyclerView.Adapter<ChildRecyclerAdap
 
     public void setItemClickListener(ItemClickListener itemClickListener) {
         this.itemClickListener = itemClickListener;
+    }
+
+    private void setAnimation(View viewToAnimate, int position) {
+        if (position > lastPosition) {
+            Animation anim = AnimationUtils.loadAnimation(viewToAnimate.getContext(), R.anim.item_animation_fall_down);
+            viewToAnimate.startAnimation(anim);
+            lastPosition = position;
+        }
     }
 
     public List<Child> getChildren() {

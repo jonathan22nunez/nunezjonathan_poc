@@ -1,12 +1,7 @@
 package com.example.nunezjonathan_poc.models;
 
-import android.app.Activity;
-import android.content.Context;
-import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.widget.Toast;
 
-import androidx.annotation.NonNull;
 import androidx.room.ColumnInfo;
 import androidx.room.Entity;
 import androidx.room.Ignore;
@@ -19,7 +14,7 @@ public class Child {
     public int _id;
 
     @ColumnInfo
-    public String name;
+    public final String name;
 
     @ColumnInfo
     public String dob;
@@ -46,8 +41,33 @@ public class Child {
         this.imageStringUri = imageStringUri;
     }
 
+    public int get_id() {
+        return _id;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public String getDob() {
+        return dob;
+    }
+
+    public int getSex() {
+        return sex;
+    }
+
+    public String getNotes() {
+        return notes;
+    }
+
+    public String getImageStringUri() {
+        return imageStringUri;
+    }
+
     public Bundle getChildBundle() {
         Bundle bundle = new Bundle();
+        bundle.putInt("_id", _id);
         bundle.putString("name", name);
         bundle.putString("dob", dob);
         bundle.putInt("sex", sex);
@@ -55,11 +75,5 @@ public class Child {
         bundle.putString("image", imageStringUri);
 
         return bundle;
-    }
-
-    public void makeCurrentlySelected(Activity activity) {
-        SharedPreferences sharedPrefs = activity.getSharedPreferences("currentChild", Context.MODE_PRIVATE);
-        sharedPrefs.edit().putLong("childId", _id).apply();
-        Toast.makeText(activity, "Current child is now... " + name, Toast.LENGTH_SHORT).show();
     }
 }

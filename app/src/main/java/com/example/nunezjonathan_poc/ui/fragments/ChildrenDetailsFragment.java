@@ -3,14 +3,10 @@ package com.example.nunezjonathan_poc.ui.fragments;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.DatePickerDialog;
-import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Bundle;
-import android.provider.MediaStore;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -27,13 +23,14 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.lifecycle.ViewModelProviders;
 import androidx.navigation.Navigation;
 
 import com.example.nunezjonathan_poc.R;
-import com.example.nunezjonathan_poc.interfaces.DatabaseListener;
 import com.example.nunezjonathan_poc.models.Child;
+import com.example.nunezjonathan_poc.ui.viewModels.ChildrenViewModel;
 import com.example.nunezjonathan_poc.utils.CalendarUtils;
-import com.example.nunezjonathan_poc.utils.ProfileImageUtils;
+import com.example.nunezjonathan_poc.utils.ImageUtils;
 
 import java.util.Calendar;
 
@@ -42,7 +39,7 @@ public class ChildrenDetailsFragment extends Fragment {
     private static final int REQUEST_CODE_CAMERA_IMAGE = 101;
     private static final int REQUEST_CODE_GALLERY_IMAGE = 102;
 
-    private DatabaseListener mListener;
+    private ChildrenViewModel mViewModel;
 
     private ImageView childImage;
     private Spinner sexSelector;
@@ -51,14 +48,14 @@ public class ChildrenDetailsFragment extends Fragment {
     private Calendar calendar;
     private Uri imageUri;
 
-    private View.OnClickListener imageClickListener = new View.OnClickListener() {
+    private final View.OnClickListener imageClickListener = new View.OnClickListener() {
         @Override
         public void onClick(View v) {
-            ProfileImageUtils.getImageFromIntent(ChildrenDetailsFragment.this);
+            ImageUtils.getImageFromIntent(ChildrenDetailsFragment.this);
         }
     };
 
-    private View.OnClickListener dobClickListener = new View.OnClickListener() {
+    private final View.OnClickListener dobClickListener = new View.OnClickListener() {
         @Override
         public void onClick(View v) {
             if (getContext() != null) {
@@ -78,20 +75,13 @@ public class ChildrenDetailsFragment extends Fragment {
         }
     };
 
-    @Override
-    public void onAttach(@NonNull Context context) {
-        super.onAttach(context);
-
-        if (context instanceof DatabaseListener) {
-            mListener = (DatabaseListener) context;
-        }
-    }
-
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         setHasOptionsMenu(true);
-        return inflater.inflate(R.layout.fragment_children_details, container, false);
+        View root = inflater.inflate(R.layout.fragment_children_details, container, false);
+        mViewModel = ViewModelProviders.of(this).get(ChildrenViewModel.class);
+        return root;
     }
 
     @Override
@@ -129,11 +119,18 @@ public class ChildrenDetailsFragment extends Fragment {
 
     private void showChildDetailsIfExists() {
         if (getArguments() != null) {
-            childName.setText(getArguments().getString("name"));
-            childDob.setText(getArguments().getString("dob"));
-            sexSelector.setSelection(getArguments().getInt("sex"));
-            childNotes.setText(getArguments().getString("notes"));
-            imageUri = Uri.parse(getArguments().getString("image"));
+            final Child child = new Child(getArguments().getString("name"));
+            child._id = getArguments().getInt("_id");
+            child.dob = getArguments().getString("dob");
+            child.sex = getArguments().getInt("sex");
+            child.notes = getArguments().getString("notes");
+            child.imageStringUri = getArguments().getString("image");
+
+            childName.setText(child.name);
+            childDob.setText(child.dob);
+            sexSelector.setSelection(child.sex);
+            childNotes.setText(child.notes);
+            imageUri = Uri.parse(child.imageStringUri);
             if (imageUri != null) {
                 childImage.setImageURI(imageUri);
             }
@@ -145,7 +142,15 @@ public class ChildrenDetailsFragment extends Fragment {
                     AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
                     builder.setTitle("Delete Child Profile");
                     builder.setMessage("You're about to delete all of this child profile's data. This is not reversible.");
-                    builder.setNegativeButton("Delete", null);
+                    builder.setNegativeButton("Delete", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            mViewModel.delete(child);
+                            if (getActivity() != null) {
+                                Navigation.findNavController(getActivity(), R.id.nav_host_fragment).popBackStack();
+                            }
+                        }
+                    });
                     builder.setPositiveButton("Cancel", null);
                     AlertDialog alertDialog = builder.create();
                     alertDialog.show();
@@ -179,7 +184,7 @@ public class ChildrenDetailsFragment extends Fragment {
                 sexSelector.getSelectedItemPosition(),
                 childNotes.getText().toString(),
                 imageUriString);
-        mListener.createChildProfile(child);
+        mViewModel.insert(child);
         if (getActivity() != null) {
             Navigation.findNavController(getActivity(), R.id.nav_host_fragment).popBackStack();
         }
@@ -203,7 +208,7 @@ public class ChildrenDetailsFragment extends Fragment {
 
         if (resultCode == Activity.RESULT_OK && data != null) {
             if (requestCode == REQUEST_CODE_CAMERA_IMAGE) {
-                imageUri = ProfileImageUtils.imageUri;
+                imageUri = ImageUtils.imageUri;
                 childImage.setImageURI(imageUri);
             } else if (requestCode == REQUEST_CODE_GALLERY_IMAGE) {
                 imageUri = data.getData();

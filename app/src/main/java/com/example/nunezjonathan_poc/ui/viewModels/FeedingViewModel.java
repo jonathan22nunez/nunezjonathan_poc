@@ -1,17 +1,30 @@
 package com.example.nunezjonathan_poc.ui.viewModels;
 
+import android.app.Application;
+import androidx.annotation.NonNull;
+import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.LiveData;
-import androidx.lifecycle.MutableLiveData;
-import androidx.lifecycle.ViewModel;
+import com.example.nunezjonathan_poc.models.Event;
+import com.example.nunezjonathan_poc.repos.FeedingRepository;
 
-public class FeedingViewModel extends ViewModel {
+import java.util.List;
 
-    private MutableLiveData<String> mText;
+public class FeedingViewModel extends AndroidViewModel {
 
-    public FeedingViewModel() {
-        mText = new MutableLiveData<>();
-        mText.setValue("My Feeding Screen");
+    private final FeedingRepository mRepository;
+    private final LiveData<List<Event>> feedingList;
+
+    public FeedingViewModel(@NonNull Application application) {
+        super(application);
+        mRepository = new FeedingRepository(application);
+        feedingList = mRepository.getFeedingList();
     }
 
-    public LiveData<String> getText() { return mText; }
+    public LiveData<List<Event>> getFeedingList() {
+        return feedingList;
+    }
+
+    public void insertFeedingEvent(Event event) {
+        mRepository.insertFeedingEvent(event);
+    }
 }

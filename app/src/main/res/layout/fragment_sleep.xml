@@ -17,9 +17,10 @@
         android:id="@+id/button_start_stop_sleep_timer"
         style="@style/TimerButton"
         android:text="@string/start"
-        app:layout_constraintTop_toBottomOf="@id/textView_sleep_timer"
+        app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"/>
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"/>
 
 
     <TextView

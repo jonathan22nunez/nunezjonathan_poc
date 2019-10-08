@@ -7,10 +7,9 @@ import android.widget.BaseAdapter;
 import android.widget.TextView;
 
 import com.example.nunezjonathan_poc.R;
-import com.example.nunezjonathan_poc.models.Sleep;
+import com.example.nunezjonathan_poc.models.Event;
 import com.example.nunezjonathan_poc.utils.CalendarUtils;
-
-import org.w3c.dom.Text;
+import com.example.nunezjonathan_poc.utils.TimeUtils;
 
 import java.util.List;
 
@@ -18,9 +17,10 @@ public class SleepListAdapter extends BaseAdapter {
 
     private static final long BASE_ID = 0x019283;
 
-    private List<Sleep> sleepList;
+    //private final List<Sleep> sleepList;
+    private final List<Event> sleepList;
 
-    public SleepListAdapter(List<Sleep> sleepList) {
+    public SleepListAdapter(List<Event> sleepList) {
         this.sleepList = sleepList;
     }
 
@@ -49,10 +49,11 @@ public class SleepListAdapter extends BaseAdapter {
             convertView = LayoutInflater.from(parent.getContext()).inflate(R.layout.sleep_log_item, parent, false);
         }
 
-        Sleep sleep = sleepList.get(position);
-        ((TextView) convertView.findViewById(R.id.textView_sleep_duration)).setText(String.valueOf(sleep.duration));
-        String startTime = CalendarUtils.toTimeHMSString(CalendarUtils.stringToCalendar(sleep.start_datetime));
-        String endTime = sleep.getEndDatetime();
+        //Sleep sleep = sleepList.get(position);
+        Event sleepEvent = sleepList.get(position);
+        ((TextView) convertView.findViewById(R.id.textView_sleep_duration)).setText(TimeUtils.timerHMS(sleepEvent.duration));
+        String startTime = CalendarUtils.toTimeHMString(CalendarUtils.stringToCalendar(sleepEvent.datetime));
+        String endTime = CalendarUtils.getEndDatetime(sleepEvent.datetime, sleepEvent.duration);
         String timeStartEnd = startTime + " - " + endTime;
         ((TextView) convertView.findViewById(R.id.textView_sleep_timeStartEnd)).setText(timeStartEnd);
 

@@ -11,10 +11,32 @@
     <string name="hint_child_name">Name (first name only)</string>
     <string name="hint_child_dob">Date of Birth</string>
     <string name="hint_notes">Notes</string>
+    <string name="hint_start_time">Starting Time</string>
+    <string name="hint_end_time">Ending Time</string>
+    <string name="hint_symptom">Enter a Symptom</string>
+    <string name="hint_drug_name">Enter a Drug Name</string>
+    <string name="hint_brand_name">Enter a Brand Name</string>
+    <string name="hint_dosage">Dosage</string>
+    <string name="hint_next_dosage_time">Next Dosage Time</string>
+
+    <!-- Labels -->
+    <string name="inputLabel_starting_amount">Starting Amount (oz)</string>
+    <string name="inputLabel_ending_amount">Ending Amount (oz)</string>
+    <string name="inputLabel_color">Select a Color</string>
+    <string name="inputLabel_hardness">Select a Hardness</string>
+    <string name="inputLabel_loose">Loose</string>
+    <string name="inputLabel_soft">Soft</string>
+    <string name="inputLabel_hard">Hard</string>
+    <string name="section_health_details">Current Health Details</string>
+    <string name="last_temp">Last Temp.:</string>
+    <string name="last_medication">Last Medication:</string>
 
     <!-- TextView as Buttons -->
     <string name="manual_entry"><u>Manual Entry</u></string>
     <string name="delete_child_profile"><u>Delete Child Profile</u></string>
+    <string name="wet">Wet</string>
+    <string name="poopy">Poopy</string>
+    <string name="mixed">Mixed</string>
 
     <!-- Spinners -->
     <string-array name="child_sex_spinner">
@@ -24,12 +46,27 @@
     </string-array>
     <string name="prompt_sex_spinner">Select a Sex</string>
 
-    <!-- Timer References -->
+    <string-array name="dosage_units">
+        <item>Select Unit</item>
+        <item>drops</item>
+        <item>oz</item>
+        <item>tsp</item>
+        <item>tbsp</item>
+        <item>mL</item>
+    </string-array>
+
+    <!-- Integer References -->
     <string name="zeroed_HMS_timer">00:00:00</string>
     <string name="zeroed_MS_timer">00:00</string>
+    <string name="zeroed_ounces">0.0</string>
 
     <!-- Buttons -->
     <string name="start">Start</string>
     <string name="stop">Stop</string>
     <string name="save">Save</string>
+    <string name="left">L</string>
+    <string name="right">R</string>
+    <string name="finish">Finish</string>
+
+
 </resources>
