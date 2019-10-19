@@ -13,8 +13,11 @@ public class Child {
     @PrimaryKey(autoGenerate = true)
     public int _id;
 
+    @Ignore
+    public String documentId;
+
     @ColumnInfo
-    public final String name;
+    public String name;
 
     @ColumnInfo
     public String dob;
@@ -27,6 +30,9 @@ public class Child {
 
     @ColumnInfo(name = "image")
     public String imageStringUri;
+
+    @Ignore
+    public Child(){}
 
     @Ignore
     public Child(String name) {
@@ -68,6 +74,7 @@ public class Child {
     public Bundle getChildBundle() {
         Bundle bundle = new Bundle();
         bundle.putInt("_id", _id);
+        bundle.putString("documentId", documentId);
         bundle.putString("name", name);
         bundle.putString("dob", dob);
         bundle.putInt("sex", sex);

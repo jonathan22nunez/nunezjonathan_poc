@@ -32,7 +32,7 @@ public class BottleDetailsFragment extends Fragment {
                 String startDatetime = getArguments().getString("datetime");
                 long duration = getArguments().getLong("duration");
 
-                Event feedingEvent = new Event(childId, Event.EventType.BOTTLE, startDatetime, duration,
+                Event feedingEvent = new Event(Event.EventType.BOTTLE, startDatetime, duration,
                         -1, -1, startingAmount, endingAmount, Event.Color.NONE, Event.Hardness.NONE);
 
                 feedingViewModel.insertFeedingEvent(feedingEvent);

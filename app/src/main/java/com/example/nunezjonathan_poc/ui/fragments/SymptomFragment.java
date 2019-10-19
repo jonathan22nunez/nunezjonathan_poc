@@ -1,19 +1,25 @@
 package com.example.nunezjonathan_poc.ui.fragments;
 
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.app.DatePickerDialog;
 import android.app.TimePickerDialog;
+import android.content.ClipData;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.ImageButton;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.TimePicker;
 import androidx.annotation.NonNull;
@@ -27,6 +33,7 @@ import com.example.nunezjonathan_poc.ui.viewModels.HealthViewModel;
 import com.example.nunezjonathan_poc.utils.CalendarUtils;
 import com.example.nunezjonathan_poc.utils.ImageUtils;
 
+import java.util.ArrayList;
 import java.util.Calendar;
 
 public class SymptomFragment extends Fragment {
@@ -38,10 +45,10 @@ public class SymptomFragment extends Fragment {
     private Calendar startDatetime;
     private TextView date, time;
     private EditText symptomInput, notes;
-    private ImageButton image1, image2, image3, image4, image5;
-    private String image1UriString = "", image2UriString = "", image3UriString = "", image4UriString = "", image5UriString = "";
-    private Uri imageUri;
-    private int selectedImageButton;
+    private ArrayList<String> imageURIs = new ArrayList<>();
+
+    private LinearLayout imagesContainer;
+
 
     private View.OnClickListener dateClickListener = new View.OnClickListener() {
         @Override
@@ -90,8 +97,29 @@ public class SymptomFragment extends Fragment {
     private View.OnClickListener imageClickListener = new View.OnClickListener() {
         @Override
         public void onClick(View v) {
-            selectedImageButton = v.getId();
-            ImageUtils.getImageFromIntent(SymptomFragment.this);
+            String[] imageOptions = {
+                    "Camera",
+                    "Gallery"
+            };
+
+            AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
+            builder.setTitle("Get image from...");
+            builder.setItems(imageOptions, new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    if (which == 0) {
+                        ImageUtils.startCameraIntent(SymptomFragment.this);
+                    } else if (which == 1) {
+                        Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
+                        intent.setType("image/*");
+                        intent.putExtra(Intent.EXTRA_ALLOW_MULTIPLE, true);
+                        startActivityForResult(Intent.createChooser(intent, "Select Image(s)..."), 500);
+                    }
+                }
+            });
+            builder.setPositiveButton("Cancel", null);
+            AlertDialog alertDialog = builder.create();
+            alertDialog.show();
         }
     };
 
@@ -99,17 +127,12 @@ public class SymptomFragment extends Fragment {
         @Override
         public void onClick(View v) {
             if (getActivity() != null) {
-                SharedPreferences sharedPrefs = getActivity().getSharedPreferences("currentChild", Context.MODE_PRIVATE);
-                long childId = sharedPrefs.getLong("childId", -1);
-                if (childId != -1) {
-                    Health health = new Health(childId, Health.HealthType.SYMPTOM,
+                    Health health = new Health(Health.HealthType.SYMPTOM,
                             CalendarUtils.toDatetimeString(startDatetime.getTime()),
-                            notes.getText().toString(), symptomInput.getText().toString(),
-                            image1UriString, image2UriString, image3UriString, image4UriString, image5UriString,
+                            notes.getText().toString(), symptomInput.getText().toString(), imageURIs,
                             null, null, -1, null, -1);
                     healthViewModel.insertHealth(health);
                     Navigation.findNavController(getActivity(), R.id.nav_host_fragment).popBackStack();
-                }
             }
         }
     };
@@ -137,16 +160,9 @@ public class SymptomFragment extends Fragment {
         symptomInput = view.findViewById(R.id.editText_symptom);
         notes = view.findViewById(R.id.editText_notes);
 
-        image1 = view.findViewById(R.id.symptom_image_1);
-        image1.setOnClickListener(imageClickListener);
-        image2 = view.findViewById(R.id.symptom_image_2);
-        image2.setOnClickListener(imageClickListener);
-        image3 = view.findViewById(R.id.symptom_image_3);
-        image3.setOnClickListener(imageClickListener);
-        image4 = view.findViewById(R.id.symptom_image_4);
-        image4.setOnClickListener(imageClickListener);
-        image5 = view.findViewById(R.id.symptom_image_5);
-        image5.setOnClickListener(imageClickListener);
+        view.findViewById(R.id.button_add_image).setOnClickListener(imageClickListener);
+
+        imagesContainer = view.findViewById(R.id.symptom_images_container);
 
         view.findViewById(R.id.button_save_symptom).setOnClickListener(saveButtonClickListener);
     }
@@ -157,33 +173,41 @@ public class SymptomFragment extends Fragment {
 
         if (resultCode == Activity.RESULT_OK && data != null) {
             if (requestCode == REQUEST_CODE_CAMERA_IMAGE) {
-                imageUri = ImageUtils.imageUri;
-            } else if (requestCode == REQUEST_CODE_GALLERY_IMAGE) {
-                imageUri = data.getData();
-            }
+                imagesContainer.addView(createImageButton(ImageUtils.imageUri));
 
-            switch (selectedImageButton) {
-                case R.id.symptom_image_1:
-                    image1.setImageURI(imageUri);
-                    image1UriString = imageUri.toString();
-                    break;
-                case R.id.symptom_image_2:
-                    image2.setImageURI(imageUri);
-                    image2UriString = imageUri.toString();
-                    break;
-                case R.id.symptom_image_3:
-                    image3.setImageURI(imageUri);
-                    image3UriString = imageUri.toString();
-                    break;
-                case R.id.symptom_image_4:
-                    image4.setImageURI(imageUri);
-                    image4UriString = imageUri.toString();
-                    break;
-                case R.id.symptom_image_5:
-                    image5.setImageURI(imageUri);
-                    image5UriString = imageUri.toString();
-                    break;
+                imageURIs.add(ImageUtils.imageUri.toString());
+
+            } else if (requestCode == 500) {
+                //TODO for images from Gallery, create a Bitmap and save to local storage
+                // Bitmap bitmap = MediaStore.Images.Media.getBitmap(this.getContentResolver(), contentURI);
+                // String path = saveImage(bitmap);
+                if (data.getData() != null) {
+                    imagesContainer.addView(createImageButton(data.getData()));
+
+                    imageURIs.add(data.getData().toString());
+                } else if (data.getClipData() != null) {
+                    ClipData clipData = data.getClipData();
+
+                    for (int i = 0; i < clipData.getItemCount(); i++) {
+                        ClipData.Item item = clipData.getItemAt(i);
+
+                        imagesContainer.addView(createImageButton(item.getUri()));
+
+                        imageURIs.add(item.getUri().toString());
+                    }
+                }
             }
         }
+    }
+
+    private ImageButton createImageButton(Uri imageUri) {
+        ImageButton imageButton = new ImageButton(getContext());
+        LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(250, 250);
+        imageButton.setLayoutParams(params);
+        imageButton.setBackground(null);
+        imageButton.setImageURI(imageUri);
+        imageButton.setScaleType(ImageView.ScaleType.CENTER_CROP);
+
+        return imageButton;
     }
 }

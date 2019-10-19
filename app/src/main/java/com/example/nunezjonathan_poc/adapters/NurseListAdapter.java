@@ -17,7 +17,6 @@ public class NurseListAdapter extends BaseAdapter {
 
     private static final long BASE_ID = 0x018283;
 
-    //private final List<Nurse> nurseList;
     private final List<Event> feedingList;
 
     public NurseListAdapter(List<Event> feedingList) {
@@ -49,10 +48,9 @@ public class NurseListAdapter extends BaseAdapter {
             convertView = LayoutInflater.from(parent.getContext()).inflate(R.layout.nurse_log_item, parent, false);
         }
 
-        //Nurse nurse = (Nurse) getItem(position);
         Event feedingEvent = (Event) getItem(position);
-        ((TextView) convertView.findViewById(R.id.textView_nurse_duration)).setText(TimeUtils.timerMS(feedingEvent.duration));
-        ((TextView) convertView.findViewById(R.id.textView_nurse_datetime))
+        ((TextView) convertView.findViewById(R.id.textView_duration)).setText(TimeUtils.timerMS(feedingEvent.duration));
+        ((TextView) convertView.findViewById(R.id.textView_time))
                 .setText(CalendarUtils.toDatetimeString(
                         CalendarUtils.stringToCalendar(feedingEvent.datetime).getTime()));
         String leftSubtext = "";
@@ -64,8 +62,8 @@ public class NurseListAdapter extends BaseAdapter {
             leftSubtext = "Start Amount: " + feedingEvent.startAmount;
             rightSubtext = "End Amount: " + feedingEvent.endAmount;
         }
-        ((TextView) convertView.findViewById(R.id.textView_left_duration)).setText(leftSubtext);
-        ((TextView) convertView.findViewById(R.id.textView_right_duration)).setText(rightSubtext);
+        ((TextView) convertView.findViewById(R.id.textView_left_subtext)).setText(leftSubtext);
+        ((TextView) convertView.findViewById(R.id.textView_right_subtext)).setText(rightSubtext);
 
         return convertView;
     }

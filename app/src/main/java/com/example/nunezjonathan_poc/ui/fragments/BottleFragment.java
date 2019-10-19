@@ -31,7 +31,7 @@ import java.util.Calendar;
 public class BottleFragment extends Fragment {
 
     private FeedingViewModel feedingViewModel;
-//    private EventViewModel eventViewModel;
+    //    private EventViewModel eventViewModel;
     private FeedingActivityListener mListener;
     private Calendar datetime;
     private TextView timerLabel, manualEntryLabel;
@@ -91,17 +91,13 @@ public class BottleFragment extends Fragment {
         @Override
         public void onClick(View v) {
             if (getActivity() != null) {
-                SharedPreferences sharedPrefs = getActivity().getSharedPreferences("currentChild", Context.MODE_PRIVATE);
-                long childId = sharedPrefs.getLong("childId", -1);
-                if (childId != -1) {
-                    Bundle bundle = new Bundle();
-                    bundle.putLong("childId", childId);
-                    bundle.putString("datetime", CalendarUtils.toDatetimeString(datetime.getTime()));
-                    bundle.putLong("duration", millis);
+                Bundle bundle = new Bundle();
+                bundle.putLong("childId", -1);
+                bundle.putString("datetime", CalendarUtils.toDatetimeString(datetime.getTime()));
+                bundle.putLong("duration", millis);
 
-                    mListener.inputBottleDetails(bundle);
-                    resetUI();
-                }
+                mListener.inputBottleDetails(bundle);
+                resetUI();
             }
         }
     };

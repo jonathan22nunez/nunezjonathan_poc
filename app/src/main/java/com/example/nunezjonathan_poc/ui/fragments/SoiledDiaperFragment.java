@@ -65,7 +65,7 @@ public class SoiledDiaperFragment extends Fragment {
                 int eventType = getArguments().getInt("eventType");
                 String datetime = getArguments().getString("datetime");
 
-                Event diaperEvent = new Event(childId, eventType, datetime,
+                Event diaperEvent = new Event(eventType, datetime,
                         -1, -1, -1, -1, -1, colorSelected, hardnessSelected);
                 diaperViewModel.insertDiaperEvent(diaperEvent);
                 Navigation.findNavController(getActivity(), R.id.nav_host_fragment).popBackStack();

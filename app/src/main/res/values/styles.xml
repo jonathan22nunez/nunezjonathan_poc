@@ -8,6 +8,7 @@
         <item name="colorAccent">@color/colorAccent</item>
         <item name="toolbarStyle">@style/CustomToolBarStyle</item>
         <item name="actionOverflowButtonStyle">@style/MyOverflowButtonStyle</item>
+        <item name="actionMenuTextColor">@color/textColorPrimary</item>
     </style>
 
     <style name="CustomToolBarStyle" parent="@style/Widget.AppCompat.Toolbar">

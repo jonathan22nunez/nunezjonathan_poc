@@ -47,7 +47,6 @@ public class Event {
         int RED = R.drawable.red_poo;
     }
 
-//    @IntDef({Hardness.NONE, Hardness.LOOSE, Hardness.SOFT, Hardness.HARD})
     @StringDef({Hardness.NONE, Hardness.LOOSE, Hardness.SOFT, Hardness.HARD})
     @Retention(RetentionPolicy.SOURCE)
     public @interface Hardness {
@@ -62,6 +61,12 @@ public class Event {
 
     @ColumnInfo(name = "child_id")
     public long childId;
+
+    @Ignore
+    public String childDocumentId;
+
+    @Ignore
+    public String documentId;
 
     @ColumnInfo(name = "event_type")
     public int eventType;
@@ -99,10 +104,9 @@ public class Event {
     @Ignore
     public Event() { }
 
-    public Event(long childId, @EventType int eventType, String datetime, long duration, long leftSideDuration,
+    public Event(@EventType int eventType, String datetime, long duration, long leftSideDuration,
                  long rightSideDuration, double startAmount, double endAmount,
                  @Color int color, @Hardness String hardness) {
-        this.childId = childId;
         this.eventType = eventType;
         this.datetime = datetime;
         this.duration = duration;

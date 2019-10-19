@@ -3,6 +3,7 @@ package com.example.nunezjonathan_poc.ui.fragments;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.os.Handler;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -15,6 +16,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.Observer;
+import androidx.lifecycle.Transformations;
 import androidx.lifecycle.ViewModelProviders;
 import androidx.navigation.Navigation;
 import androidx.recyclerview.widget.ItemTouchHelper;
@@ -39,13 +41,13 @@ public class ChildrenListFragment extends Fragment implements ItemClickListener 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         setHasOptionsMenu(true);
-        final View root = inflater.inflate(R.layout.fragment_children_test, container, false);
+        View root = inflater.inflate(R.layout.fragment_children_test, container, false);
         ChildrenViewModel childrenViewModel = ViewModelProviders.of(this).get(ChildrenViewModel.class);
         childrenViewModel.getChildren().observe(this, new Observer<List<Child>>() {
             @Override
             public void onChanged(List<Child> children) {
                 mChildren = children;
-                recyclerAdapter = new ChildRecyclerAdapter(children);
+                recyclerAdapter = new ChildRecyclerAdapter(getContext(), children);
                 recyclerAdapter.setItemClickListener(ChildrenListFragment.this);
                 recyclerView.setAdapter(recyclerAdapter);
             }
@@ -101,8 +103,18 @@ public class ChildrenListFragment extends Fragment implements ItemClickListener 
         if (getActivity() != null) {
             SharedPreferences sharedPrefs = getActivity().getSharedPreferences("currentChild", Context.MODE_PRIVATE);
             sharedPrefs.edit().putLong("childId", (long) mChildren.get(position)._id).apply();
+            sharedPrefs.edit().putString("childName", mChildren.get(position).name).apply();
+            sharedPrefs.edit().putString("childDocumentId", mChildren.get(position).documentId).apply();
 
             Toast.makeText(getContext(), "Current Child is now " + mChildren.get(position).name, Toast.LENGTH_SHORT).show();
+
+            Handler handler = new Handler();
+            handler.postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    recyclerAdapter.notifyDataSetChanged();
+                }
+            }, 100);
         }
     }
 }

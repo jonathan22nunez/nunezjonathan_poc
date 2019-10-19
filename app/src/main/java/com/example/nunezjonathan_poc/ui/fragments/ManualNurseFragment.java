@@ -60,7 +60,7 @@ public class ManualNurseFragment extends Fragment {
                 long childId = sharedPrefs.getLong("childId", -1);
                 if (childId != -1) {
                     long millis = durationBetweenStartAndEnd();
-                    Event feedingEvent = new Event(childId, Event.EventType.NURSE,
+                    Event feedingEvent = new Event(Event.EventType.NURSE,
                             CalendarUtils.toDatetimeString(datetime.getTime()),
                             millis,
                             -1, -1 , -1, -1, Event.Color.NONE, Event.Hardness.NONE);

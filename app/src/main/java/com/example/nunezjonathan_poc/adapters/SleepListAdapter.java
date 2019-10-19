@@ -51,11 +51,11 @@ public class SleepListAdapter extends BaseAdapter {
 
         //Sleep sleep = sleepList.get(position);
         Event sleepEvent = sleepList.get(position);
-        ((TextView) convertView.findViewById(R.id.textView_sleep_duration)).setText(TimeUtils.timerHMS(sleepEvent.duration));
+        ((TextView) convertView.findViewById(R.id.textView_duration)).setText(TimeUtils.timerHMS(sleepEvent.duration));
         String startTime = CalendarUtils.toTimeHMString(CalendarUtils.stringToCalendar(sleepEvent.datetime));
         String endTime = CalendarUtils.getEndDatetime(sleepEvent.datetime, sleepEvent.duration);
         String timeStartEnd = startTime + " - " + endTime;
-        ((TextView) convertView.findViewById(R.id.textView_sleep_timeStartEnd)).setText(timeStartEnd);
+        ((TextView) convertView.findViewById(R.id.textView_timeStartEnd)).setText(timeStartEnd);
 
         return convertView;
     }

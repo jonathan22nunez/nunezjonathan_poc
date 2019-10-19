@@ -5,6 +5,7 @@ import androidx.annotation.NonNull;
 import androidx.room.ColumnInfo;
 import androidx.room.Entity;
 import androidx.room.ForeignKey;
+import androidx.room.Ignore;
 import androidx.room.Index;
 import androidx.room.PrimaryKey;
 
@@ -12,6 +13,7 @@ import com.example.nunezjonathan_poc.utils.CalendarUtils;
 
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
+import java.util.ArrayList;
 
 @Entity(tableName = "health_events",
         foreignKeys = @ForeignKey(entity = Child.class,
@@ -33,76 +35,69 @@ public class Health {
     public int _id;
 
     @ColumnInfo(name = "child_id")
-    public final long childId;
+    public long childId;
+
+    @Ignore
+    public String childDocumentId;
+
+    @Ignore
+    public String documentId;
 
     @ColumnInfo(name = "health_type")
-    public final int healthType;
+    public int healthType;
 
     @ColumnInfo
-    public final String datetime;
+    public String datetime;
 
     @ColumnInfo
-    public final String notes;
+    public String notes;
 
     //Symptom Event
 
     @ColumnInfo
-    public final String symptom;
+    public String symptom;
 
-    @ColumnInfo(name = "image1")
-    public final String image1_uri;
-
-    @ColumnInfo(name = "image2")
-    public final String image2_uri;
-
-    @ColumnInfo(name = "image3")
-    public final String image3_uri;
-
-    @ColumnInfo(name = "image4")
-    public final String image4_uri;
-
-    @ColumnInfo(name = "image5")
-    public final String image5_uri;
+    @ColumnInfo(name = "image_uris)")
+    public ArrayList<String> imageURIs;
 
     //Medication Event
 
     @ColumnInfo(name = "drug_name")
-    public final String drugName;
+    public String drugName;
 
     @ColumnInfo(name = "brand_name")
-    public final String brandName;
+    public String brandName;
 
     @ColumnInfo
-    public final double dosage;
+    public double dosage;
 
     @ColumnInfo
-    public final String unit;
+    public String unit;
 
     //Temperature Event
 
     @ColumnInfo
-    public final double temperature;
+    public double temperature;
 
-    public Health(long childId, @HealthType int healthType, String datetime, String notes, String symptom,
-                  String image1_uri, String image2_uri, String image3_uri, String image4_uri,
-                  String image5_uri, String drugName, String brandName, double dosage, String unit,
+    @Ignore
+    public Health() {
+    }
+
+    public Health(@HealthType int healthType, String datetime, String notes, String symptom,
+                  ArrayList<String> imageURIs, String drugName, String brandName, double dosage, String unit,
                   double temperature) {
-        this.childId = childId;
         this.healthType = healthType;
         this.datetime = datetime;
         this.notes = notes;
         this.symptom = symptom;
-        this.image1_uri = image1_uri;
-        this.image2_uri = image2_uri;
-        this.image3_uri = image3_uri;
-        this.image4_uri = image4_uri;
-        this.image5_uri = image5_uri;
+        this.imageURIs = imageURIs;
         this.drugName = drugName;
         this.brandName = brandName;
         this.dosage = dosage;
         this.unit = unit;
         this.temperature = temperature;
     }
+
 
     @NonNull
     @Override

@@ -3,6 +3,7 @@ package com.example.nunezjonathan_poc.ui.fragments;
 import android.app.DatePickerDialog;
 import android.app.TimePickerDialog;
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -32,6 +33,7 @@ public class DiaperFragment extends Fragment {
     private DiaperViewModel diaperViewModel;
     private Calendar startDatetime;
     private TextView date, time;
+    private String childName;
 
     private View.OnClickListener dateClickListener = new View.OnClickListener() {
         @Override
@@ -47,7 +49,7 @@ public class DiaperFragment extends Fragment {
                         startDatetime.get(Calendar.YEAR),
                         startDatetime.get(Calendar.MONTH),
                         startDatetime.get(Calendar.DAY_OF_MONTH))
-                .show();
+                        .show();
             }
         }
     };
@@ -71,7 +73,7 @@ public class DiaperFragment extends Fragment {
                         startDatetime.get(Calendar.HOUR_OF_DAY),
                         startDatetime.get(Calendar.MINUTE),
                         false)
-                .show();
+                        .show();
             }
         }
     };
@@ -80,13 +82,9 @@ public class DiaperFragment extends Fragment {
         @Override
         public void onClick(View v) {
             if (getContext() != null) {
-                long childId = getContext().getSharedPreferences("currentChild",
-                        Context.MODE_PRIVATE).getLong("childId", -1);
-                if (childId != -1) {
-                    Event diaperEvent = new Event(childId, Event.EventType.WET, CalendarUtils.toDatetimeString(startDatetime.getTime()),
-                            -1, -1, -1, -1, -1, Event.Color.NONE, Event.Hardness.NONE);
-                    diaperViewModel.insertDiaperEvent(diaperEvent);
-                }
+                Event diaperEvent = new Event(Event.EventType.WET, CalendarUtils.toDatetimeString(startDatetime.getTime()),
+                        -1, -1, -1, -1, -1, Event.Color.NONE, Event.Hardness.NONE);
+                diaperViewModel.insertDiaperEvent(diaperEvent);
             }
         }
     };
@@ -95,23 +93,19 @@ public class DiaperFragment extends Fragment {
         @Override
         public void onClick(View v) {
             if (getContext() != null && getActivity() != null) {
-                long childId = getContext().getSharedPreferences("currentChild",
-                        Context.MODE_PRIVATE).getLong("childId", -1);
-                if (childId != -1) {
-                    Bundle bundle = new Bundle();
-                    bundle.putLong("childId", childId);
+                Bundle bundle = new Bundle();
+                bundle.putLong("childId", -1);
 
-                    if (v.getId() == R.id.textView_mixed_activity) {
-                        bundle.putInt("eventType", Event.EventType.MIXED);
-                    } else {
-                        bundle.putInt("eventType", Event.EventType.POOPY);
-                    }
-
-                    bundle.putString("datetime", CalendarUtils.toDatetimeString(startDatetime.getTime()));
-
-                    Navigation.findNavController(getActivity(), R.id.nav_host_fragment)
-                            .navigate(R.id.action_navigation_diaper_to_soiledDiaperFragment, bundle);
+                if (v.getId() == R.id.textView_mixed_activity) {
+                    bundle.putInt("eventType", Event.EventType.MIXED);
+                } else {
+                    bundle.putInt("eventType", Event.EventType.POOPY);
                 }
+
+                bundle.putString("datetime", CalendarUtils.toDatetimeString(startDatetime.getTime()));
+
+                Navigation.findNavController(getActivity(), R.id.nav_host_fragment)
+                        .navigate(R.id.action_navigation_diaper_to_soiledDiaperFragment, bundle);
             }
         }
     };
@@ -125,10 +119,32 @@ public class DiaperFragment extends Fragment {
     }
 
     @Override
+    public void onResume() {
+        super.onResume();
+
+        if (getContext() != null) {
+            SharedPreferences sharedPrefs = getContext().getSharedPreferences("currentChild", Context.MODE_PRIVATE);
+            String childName = sharedPrefs.getString("childName", null);
+            if (childName != null) {
+                this.childName = childName;
+            }
+        }
+    }
+
+    @Override
     public void onCreateOptionsMenu(@NonNull Menu menu, @NonNull MenuInflater inflater) {
         super.onCreateOptionsMenu(menu, inflater);
 
         inflater.inflate(R.menu.activities_menu, menu);
+    }
+
+    @Override
+    public void onPrepareOptionsMenu(@NonNull Menu menu) {
+        super.onPrepareOptionsMenu(menu);
+
+        if (childName != null) {
+            menu.findItem(R.id.menu_item_children).setTitle(childName);
+        }
     }
 
     @Override
@@ -139,7 +155,7 @@ public class DiaperFragment extends Fragment {
             }
         } else if (item.getItemId() == R.id.menu_item_children) {
             if (getActivity() != null) {
-                Navigation.findNavController(getActivity(), R.id.nav_host_fragment).navigate(R.id.action_navigation_sleep_to_childrenListFragment);
+                Navigation.findNavController(getActivity(), R.id.nav_host_fragment).navigate(R.id.action_navigation_diaper_to_childrenListFragment);
             }
         }
         return true;

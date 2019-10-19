@@ -27,6 +27,7 @@ public class FeedingFragment extends Fragment {
 
     private FeedingActivityListener mListener;
     private SharedPreferences sharedPrefs;
+    private String childName;
 
     @Override
     public void onAttach(@NonNull Context context) {
@@ -45,6 +46,19 @@ public class FeedingFragment extends Fragment {
     }
 
     @Override
+    public void onResume() {
+        super.onResume();
+
+        if (getContext() != null) {
+            sharedPrefs = getContext().getSharedPreferences("currentChild", Context.MODE_PRIVATE);
+            String childName = sharedPrefs.getString("childName", null);
+            if (childName != null) {
+                this.childName = childName;
+            }
+        }
+    }
+
+    @Override
     public void onCreateOptionsMenu(@NonNull Menu menu, @NonNull MenuInflater inflater) {
         super.onCreateOptionsMenu(menu, inflater);
 
@@ -52,10 +66,22 @@ public class FeedingFragment extends Fragment {
     }
 
     @Override
+    public void onPrepareOptionsMenu(@NonNull Menu menu) {
+        super.onPrepareOptionsMenu(menu);
+
+        if (childName != null) {
+            menu.findItem(R.id.menu_item_children).setTitle(childName);
+        }
+    }
+
+    @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
 
         if (item.getItemId() == R.id.menu_item_log) {
             mListener.viewLog();
+            return true;
+        } else if (item.getItemId() == R.id.menu_item_children) {
+            mListener.viewChildren();
             return true;
         }
 

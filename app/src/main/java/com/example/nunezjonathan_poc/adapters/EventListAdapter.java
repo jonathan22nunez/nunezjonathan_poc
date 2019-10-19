@@ -58,7 +58,7 @@ public class EventListAdapter extends BaseAdapter {
             if (eventType == Event.EventType.SLEEP) {
                 convertView = LayoutInflater.from(parent.getContext()).inflate(R.layout.sleep_log_item, parent, false);
                 holder = new SleepViewHolder();
-                holder.duration = convertView.findViewById(R.id.textView_sleep_duration);
+                holder.duration = convertView.findViewById(R.id.textView_duration);
 
                 convertView.setTag(holder);
             }

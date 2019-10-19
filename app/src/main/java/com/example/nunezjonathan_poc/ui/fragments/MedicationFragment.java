@@ -111,25 +111,23 @@ public class MedicationFragment extends Fragment {
         @Override
         public void onClick(View v) {
             if (getActivity() != null) {
-                SharedPreferences sharedPrefs = getActivity().getSharedPreferences("currentChild", Context.MODE_PRIVATE);
-                long childId = sharedPrefs.getLong("childId", -1);
-                if (childId != -1) {
                     double dosageNum;
                     if (dosage.getText().toString().isEmpty()) {
                         dosageNum = 0;
                     } else {
                         dosageNum = Double.parseDouble(dosage.getText().toString());
                     }
-                    Health health = new Health(childId, Health.HealthType.MEDICATION,
+                    Health health = new Health(Health.HealthType.MEDICATION,
                             CalendarUtils.toDatetimeString(startDatetime.getTime()),
                             notes.getText().toString(),
-                            null, null, null, null, null, null,
+                            null, null,
                             drugName.getText().toString(),
                             brandName.getText().toString(),
-                            dosageNum, dosageUnit, -1);
+                            dosageNum,
+                            dosageUnit,
+                            -1);
                     healthViewModel.insertHealth(health);
                     Navigation.findNavController(getActivity(), R.id.nav_host_fragment).popBackStack();
-                }
             }
         }
     };

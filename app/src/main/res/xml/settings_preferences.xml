@@ -11,21 +11,9 @@
             android:enabled="false"/>
 
         <Preference
-            android:key="syncDevices"
-            android:title="Sync Devices"
-            android:summary="Sync all registered devices to the most recent data"
-            android:enabled="false"/>
-
-        <Preference
-            android:key="backupData"
-            android:title="Backup Data"
-            android:summary="Force data upload to the Cloud"
-            android:enabled="false"/>
-
-        <Preference
-            android:key="restoreData"
-            android:title="Restore Data"
-            android:summary="Restore all data from last Cloud Backup"
+            android:key="linkedAccounts"
+            android:title="Manage Linked Accounts"
+            android:summary="Manage the accounts that have access to your family"
             android:enabled="false"/>
 
     </PreferenceCategory>
@@ -46,7 +34,7 @@
         <Preference
             android:key="deleteAll"
             android:title="Delete All"
-            android:summary="This will delete all data currently on the device and the associated Cloud data"
+            android:summary="This will delete all data currently on the device or the associated Cloud data"
             android:enabled="false"/>
 
     </PreferenceCategory>

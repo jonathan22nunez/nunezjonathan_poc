@@ -38,6 +38,7 @@ public class SleepFragment extends Fragment {
     private TextView timerLabel, manualEntryLabel;
     private Button timerButton, saveButton;
     private long millis = 0;
+    private String childName;
 
     private final BroadcastReceiver receiver = new BroadcastReceiver() {
         @Override
@@ -93,16 +94,15 @@ public class SleepFragment extends Fragment {
         @Override
         public void onClick(View v) {
             if (getActivity() != null) {
-                SharedPreferences sharedPrefs = getActivity().getSharedPreferences("currentChild", Context.MODE_PRIVATE);
-                long childId = sharedPrefs.getLong("childId", -1);
-                if (childId != -1) {
-                    Event sleepEvent = new Event(childId, Event.EventType.SLEEP,
-                            CalendarUtils.toDatetimeString(datetime.getTime()),
-                            millis,
-                            -1, -1, -1, -1, Event.Color.NONE, Event.Hardness.NONE);
-                    sleepViewModel.insertSleep(sleepEvent);
-                    resetUI();
-                }
+                Event sleepEvent = new Event(
+                        Event.EventType.SLEEP,
+                        CalendarUtils.toDatetimeString(datetime.getTime()),
+                        millis,
+                        -1, -1, -1, -1,
+                        Event.Color.NONE,
+                        Event.Hardness.NONE);
+                sleepViewModel.insertSleep(sleepEvent);
+                resetUI();
             }
         }
     };
@@ -125,6 +125,28 @@ public class SleepFragment extends Fragment {
         super.onCreateOptionsMenu(menu, inflater);
 
         inflater.inflate(R.menu.activities_menu, menu);
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+
+        if (getContext() != null) {
+            SharedPreferences sharedPrefs = getContext().getSharedPreferences("currentChild", Context.MODE_PRIVATE);
+            String childName = sharedPrefs.getString("childName", null);
+            if (childName != null) {
+                this.childName = childName;
+            }
+        }
+    }
+
+    @Override
+    public void onPrepareOptionsMenu(@NonNull Menu menu) {
+        super.onPrepareOptionsMenu(menu);
+
+        if (childName != null) {
+            menu.findItem(R.id.menu_item_children).setTitle(childName);
+        }
     }
 
     @Override

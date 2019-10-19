@@ -5,7 +5,6 @@
     <item
         android:id="@+id/menu_item_children"
         android:title="Child"
-        android:icon="@drawable/ic_children"
         app:showAsAction="ifRoom"/>
     <item
         android:id="@+id/menu_item_settings"

@@ -112,16 +112,12 @@ public class NurseFragment extends Fragment {
         @Override
         public void onClick(View v) {
             if (getActivity() != null) {
-                SharedPreferences sharedPrefs = getActivity().getSharedPreferences("currentChild", Context.MODE_PRIVATE);
-                long childId = sharedPrefs.getLong("childId", -1);
-                if (childId != -1) {
-                    Event feedingEvent = new Event(childId, Event.EventType.NURSE,
-                            CalendarUtils.toDatetimeString(datetime.getTime()),
-                            millis, leftMillis, rightMillis,
-                            -1, -1, Event.Color.NONE, Event.Hardness.NONE);
-                    feedingViewModel.insertFeedingEvent(feedingEvent);
-                    resetUI();
-                }
+                Event feedingEvent = new Event(Event.EventType.NURSE,
+                        CalendarUtils.toDatetimeString(datetime.getTime()),
+                        millis, leftMillis, rightMillis,
+                        -1, -1, Event.Color.NONE, Event.Hardness.NONE);
+                feedingViewModel.insertFeedingEvent(feedingEvent);
+                resetUI();
             }
         }
     };

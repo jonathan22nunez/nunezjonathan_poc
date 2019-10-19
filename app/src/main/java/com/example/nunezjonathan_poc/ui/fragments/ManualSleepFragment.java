@@ -79,7 +79,7 @@ public class ManualSleepFragment extends Fragment {
                     long childId = sharedPrefs.getLong("childId", -1);
                     if (childId != -1) {
                         long millis = durationBetweenStartAndEnd();
-                        Event sleepEvent = new Event(childId, Event.EventType.SLEEP,
+                        Event sleepEvent = new Event(Event.EventType.SLEEP,
                                 CalendarUtils.toDatetimeString(datetime.getTime()),
                                 millis,
                                 -1, -1, -1, -1, Event.Color.NONE, Event.Hardness.NONE);

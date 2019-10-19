@@ -63,7 +63,7 @@ public class ManualBottleFragment extends Fragment {
                 long childId = sharedPrefs.getLong("childId", -1);
                 if (childId != -1) {
                     long millis = durationBetweenStartAndEnd();
-                    Event feedingEvent = new Event(childId, Event.EventType.BOTTLE,
+                    Event feedingEvent = new Event(Event.EventType.BOTTLE,
                             CalendarUtils.toDatetimeString(datetime.getTime()),
                             millis,
                             -1, -1 ,

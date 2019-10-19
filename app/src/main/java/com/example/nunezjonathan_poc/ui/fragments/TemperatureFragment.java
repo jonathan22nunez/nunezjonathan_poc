@@ -108,18 +108,13 @@ public class TemperatureFragment extends Fragment {
         @Override
         public void onClick(View v) {
             if (getActivity() != null) {
-                SharedPreferences sharedPrefs = getActivity().getSharedPreferences("currentChild", Context.MODE_PRIVATE);
-                long childId = sharedPrefs.getLong("childId", -1);
-                if (childId != -1) {
-                    Health health = new Health(childId, Health.HealthType.TEMPERATURE,
+                    Health health = new Health(Health.HealthType.TEMPERATURE,
                             CalendarUtils.toDatetimeString(startDatetime.getTime()),
                             notes.getText().toString(),
-                            null, null, null, null, null, null,
-                            null, null, -1, null,
+                            null, null, null, null, -1, null,
                             temp);
                     healthViewModel.insertHealth(health);
                     Navigation.findNavController(getActivity(), R.id.nav_host_fragment).popBackStack();
-                }
             }
         }
     };

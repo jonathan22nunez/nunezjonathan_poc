@@ -7,6 +7,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
+import android.provider.MediaStore;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -31,13 +32,12 @@ import com.example.nunezjonathan_poc.models.Child;
 import com.example.nunezjonathan_poc.ui.viewModels.ChildrenViewModel;
 import com.example.nunezjonathan_poc.utils.CalendarUtils;
 import com.example.nunezjonathan_poc.utils.ImageUtils;
+import com.theartofdev.edmodo.cropper.CropImage;
+import com.theartofdev.edmodo.cropper.CropImageView;
 
 import java.util.Calendar;
 
 public class ChildrenDetailsFragment extends Fragment {
-
-    private static final int REQUEST_CODE_CAMERA_IMAGE = 101;
-    private static final int REQUEST_CODE_GALLERY_IMAGE = 102;
 
     private ChildrenViewModel mViewModel;
 
@@ -51,7 +51,14 @@ public class ChildrenDetailsFragment extends Fragment {
     private final View.OnClickListener imageClickListener = new View.OnClickListener() {
         @Override
         public void onClick(View v) {
-            ImageUtils.getImageFromIntent(ChildrenDetailsFragment.this);
+            if (getContext() != null) {
+                CropImage.activity()
+                        .setCropShape(CropImageView.CropShape.OVAL)
+                        .setGuidelines(CropImageView.Guidelines.ON)
+                        .setMinCropResultSize(300,300)
+                        .setMaxCropResultSize(800,800)
+                        .start(getContext(), ChildrenDetailsFragment.this);
+            }
         }
     };
 
@@ -104,7 +111,8 @@ public class ChildrenDetailsFragment extends Fragment {
             spinnerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
             sexSelector.setAdapter(spinnerAdapter);
 
-            childImage = view.findViewById(R.id.imageView_child_image);
+            view.findViewById(R.id.cardview).setOnClickListener(imageClickListener);
+            childImage = view.findViewById(R.id.imageView);
             childName = view.findViewById(R.id.editText_child_name);
             childDob = view.findViewById(R.id.editText_child_dob);
             childNotes = view.findViewById(R.id.editText_child_notes);
@@ -121,6 +129,7 @@ public class ChildrenDetailsFragment extends Fragment {
         if (getArguments() != null) {
             final Child child = new Child(getArguments().getString("name"));
             child._id = getArguments().getInt("_id");
+            child.documentId = getArguments().getString("documentId");
             child.dob = getArguments().getString("dob");
             child.sex = getArguments().getInt("sex");
             child.notes = getArguments().getString("notes");
@@ -207,11 +216,9 @@ public class ChildrenDetailsFragment extends Fragment {
         super.onActivityResult(requestCode, resultCode, data);
 
         if (resultCode == Activity.RESULT_OK && data != null) {
-            if (requestCode == REQUEST_CODE_CAMERA_IMAGE) {
-                imageUri = ImageUtils.imageUri;
-                childImage.setImageURI(imageUri);
-            } else if (requestCode == REQUEST_CODE_GALLERY_IMAGE) {
-                imageUri = data.getData();
+            if (requestCode == CropImage.CROP_IMAGE_ACTIVITY_REQUEST_CODE) {
+                CropImage.ActivityResult result = CropImage.getActivityResult(data);
+                imageUri = result.getUri();
                 childImage.setImageURI(imageUri);
             }
         }

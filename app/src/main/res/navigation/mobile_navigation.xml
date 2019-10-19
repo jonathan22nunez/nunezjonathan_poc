@@ -55,6 +55,10 @@
             app:destination="@id/soiledDiaperFragment"
             app:popUpTo="@+id/navigation_diaper" />
         <action
+            android:id="@+id/action_navigation_diaper_to_childrenListFragment"
+            app:destination="@id/childrenListFragment"
+            app:popUpTo="@+id/navigation_diaper" />
+        <action
             android:id="@+id/action_navigation_diaper_to_diaperLogListFragment"
             app:destination="@id/diaperLogListFragment" />
     </fragment>
@@ -75,6 +79,14 @@
         <action
             android:id="@+id/action_navigation_health_to_temperatureFragment"
             app:destination="@id/temperatureFragment"
+            app:popUpTo="@+id/navigation_health" />
+        <action
+            android:id="@+id/action_navigation_health_to_childrenListFragment"
+            app:destination="@id/childrenListFragment"
+            app:popUpTo="@+id/navigation_health" />
+        <action
+            android:id="@+id/action_navigation_health_to_symptomImagesFragment"
+            app:destination="@id/symptomImagesFragment"
             app:popUpTo="@+id/navigation_health" />
     </fragment>
     <fragment
@@ -125,7 +137,12 @@
     <fragment
         android:id="@+id/settingsFragment"
         android:name="com.example.nunezjonathan_poc.ui.fragments.SettingsFragment"
-        android:label="Settings" />
+        android:label="Settings" >
+        <action
+            android:id="@+id/action_settingsFragment_to_linkedAccountsFragment"
+            app:destination="@id/linkedAccountsFragment"
+            app:popUpTo="@+id/settingsFragment" />
+    </fragment>
     <fragment
         android:id="@+id/childrenListFragment"
         android:name="com.example.nunezjonathan_poc.ui.fragments.ChildrenListFragment"
@@ -147,7 +164,7 @@
         android:id="@+id/feedingLogListFragment"
         android:name="com.example.nunezjonathan_poc.ui.fragments.FeedingLogListFragment"
         android:label="Feeding Log"
-        tools:layout="@layout/fragment_overview" />
+        tools:layout="@layout/fragment_children_test" />
     <fragment
         android:id="@+id/manualNurseFragment"
         android:name="com.example.nunezjonathan_poc.ui.fragments.ManualNurseFragment"
@@ -157,11 +174,21 @@
         android:id="@+id/diaperLogListFragment"
         android:name="com.example.nunezjonathan_poc.ui.fragments.DiaperLogListFragment"
         android:label="Diaper Log"
-        tools:layout="@layout/fragment_overview" />
+        tools:layout="@layout/fragment_children_test" />
     <fragment
         android:id="@+id/sleepLogListFragment"
         android:name="com.example.nunezjonathan_poc.ui.fragments.SleepLogListFragment"
         android:label="Sleep Log"
-        tools:layout="@layout/fragment_overview" />
+        tools:layout="@layout/fragment_children_test" />
+    <fragment
+        android:id="@+id/linkedAccountsFragment"
+        android:name="com.example.nunezjonathan_poc.ui.fragments.LinkedAccountsFragment"
+        android:label="Linked Accounts"
+        tools:layout="@layout/fragment_linked_accounts" />
+    <fragment
+        android:id="@+id/symptomImagesFragment"
+        android:name="com.example.nunezjonathan_poc.ui.fragments.SymptomImagesFragment"
+        android:label="Symptom Images"
+        tools:layout="@layout/fragment_symptom_images" />
 
 </navigation>

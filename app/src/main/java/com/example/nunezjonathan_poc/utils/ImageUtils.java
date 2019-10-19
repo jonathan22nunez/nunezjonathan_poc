@@ -51,7 +51,7 @@ public class ImageUtils {
         alertDialog.show();
     }
 
-    private static void startCameraIntent(Fragment fragment) {
+    public static void startCameraIntent(Fragment fragment) {
         if (fragment.getContext() != null) {
             Intent cameraIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
             if (cameraIntent.resolveActivity(fragment.getContext().getPackageManager()) != null) {
