@@ -30,10 +30,7 @@ import java.util.Calendar;
 
 public class BottleFragment extends Fragment {
 
-    private FeedingViewModel feedingViewModel;
-    //    private EventViewModel eventViewModel;
     private FeedingActivityListener mListener;
-    private Calendar datetime;
     private TextView timerLabel, manualEntryLabel;
     private Button timerButton, finishButton;
     private long millis = 0;
@@ -57,9 +54,6 @@ public class BottleFragment extends Fragment {
                     manualEntryLabel.setVisibility(View.GONE);
                     finishButton.setVisibility(View.VISIBLE);
                 } else {
-                    if (millis == 0) {
-                        datetime = Calendar.getInstance();
-                    }
                     intent.putExtra(BottleTimerService.EXTRA_TIME_MILLIS, millis);
                     ContextCompat.startForegroundService(getActivity(), intent);
                     timerButton.setText(R.string.stop);
@@ -93,7 +87,7 @@ public class BottleFragment extends Fragment {
             if (getActivity() != null) {
                 Bundle bundle = new Bundle();
                 bundle.putLong("childId", -1);
-                bundle.putString("datetime", CalendarUtils.toDatetimeString(datetime.getTime()));
+                bundle.putString("datetime", CalendarUtils.toDatetimeString(BottleTimerService.datetime.getTime()));
                 bundle.putLong("duration", millis);
 
                 mListener.inputBottleDetails(bundle);
@@ -114,8 +108,6 @@ public class BottleFragment extends Fragment {
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        feedingViewModel = ViewModelProviders.of(this).get(FeedingViewModel.class);
-//        eventViewModel = ViewModelProviders.of(this).get(EventViewModel.class);
         if (getActivity() != null) {
             IntentFilter filter = new IntentFilter(BottleTimerService.ACTION_UPDATE_TIMER);
             getActivity().registerReceiver(receiver, filter);
@@ -126,8 +118,6 @@ public class BottleFragment extends Fragment {
     @Override
     public void onViewCreated(@NonNull final View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-
-        datetime = Calendar.getInstance();
 
         timerLabel = view.findViewById(R.id.textView_bottle_timer);
         timerButton = view.findViewById(R.id.button_start_stop_bottle_timer);

@@ -6,6 +6,7 @@ import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 
+import com.example.nunezjonathan_poc.interfaces.EventActivityListener;
 import com.example.nunezjonathan_poc.models.Event;
 import com.example.nunezjonathan_poc.repos.FeedingRepository;
 import com.example.nunezjonathan_poc.utils.OptionalServices;
@@ -35,8 +36,8 @@ public class FeedingViewModel extends AndroidViewModel {
         }
     }
 
-    public void insertFeedingEvent(Event event) {
-        mRepository.insertFeedingEvent(event);
+    public void insertFeedingEvent(EventActivityListener listener, Event event) {
+        mRepository.insertFeedingEvent(listener, event);
     }
 
     public void deleteFeeding(Event event) {

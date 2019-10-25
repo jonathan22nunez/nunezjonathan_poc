@@ -5,6 +5,7 @@ import androidx.room.Dao;
 import androidx.room.Delete;
 import androidx.room.Insert;
 import androidx.room.Query;
+import androidx.room.Update;
 
 import com.example.nunezjonathan_poc.models.Child;
 
@@ -30,6 +31,9 @@ public interface ChildDao {
 
     @Insert
     void insertAll(Child... children);
+
+    @Update
+    int update(Child... children);
 
     @Delete
     int delete(Child... children);

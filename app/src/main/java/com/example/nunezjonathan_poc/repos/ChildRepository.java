@@ -2,6 +2,7 @@ package com.example.nunezjonathan_poc.repos;
 
 import android.app.Application;
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.util.LongSparseArray;
@@ -15,6 +16,7 @@ import androidx.lifecycle.MutableLiveData;
 import com.example.nunezjonathan_poc.daos.ChildDao;
 import com.example.nunezjonathan_poc.databases.AppDatabase;
 import com.example.nunezjonathan_poc.databases.FirestoreDatabase;
+import com.example.nunezjonathan_poc.interfaces.EventActivityListener;
 import com.example.nunezjonathan_poc.models.Child;
 import com.example.nunezjonathan_poc.utils.OptionalServices;
 import com.google.firebase.firestore.EventListener;
@@ -69,11 +71,19 @@ public class ChildRepository {
         else return mChildrenRoom;
     }
 
-    public void insertChildData(Child child) {
+    public void insertChildData(EventActivityListener listener, Child child) {
         if (OptionalServices.cloudSyncEnabled(mApplication)) {
-            FirestoreDatabase.addChildToDB(mApplication, child, true);
+            FirestoreDatabase.addChildToDB(listener, mApplication, child, true);
         } else {
-            new insertAsyncTask(mApplication, mChildDao).execute(child);
+            new insertAsyncTask(listener, mApplication, mChildDao).execute(child);
+        }
+    }
+
+    public void updateChildData(EventActivityListener listener, Child child) {
+        if (OptionalServices.cloudSyncEnabled(mApplication)) {
+            FirestoreDatabase.updateChildInDB(listener, mApplication, child);
+        } else {
+            new updateAsyncTask(listener, mApplication, mChildDao).execute(child);
         }
     }
 
@@ -88,10 +98,12 @@ public class ChildRepository {
 
     private static class insertAsyncTask extends AsyncTask<Child, Void, LongSparseArray<Child>> {
 
+        private final EventActivityListener mListener;
         private final ChildDao mAsyncTaskDao;
         private final Application mApplication;
 
-        insertAsyncTask(Application application, ChildDao dao) {
+        insertAsyncTask(EventActivityListener listener, Application application, ChildDao dao) {
+            this.mListener = listener;
             mApplication = application;
             mAsyncTaskDao = dao;
         }
@@ -116,7 +128,46 @@ public class ChildRepository {
                 sharedPrefs.edit().putString("childName", lsa.get(rowId).name).apply();
                 sharedPrefs.edit().putString("childImageUriString", lsa.get(rowId).imageStringUri).apply();
 
-                Toast.makeText(mApplication, "Successfully created Child Profile", Toast.LENGTH_SHORT).show();
+                mListener.savedSuccessfully();
+
+//                Toast.makeText(mApplication, "Successfully created Child Profile", Toast.LENGTH_SHORT).show();
+            }
+        }
+    }
+
+    private static class updateAsyncTask extends AsyncTask<Child, Void, Integer> {
+
+        private final EventActivityListener mListener;
+        private final ChildDao mAsyncTaskDao;
+        private final Application mApplication;
+
+        public updateAsyncTask(EventActivityListener listener, Application application, ChildDao mAsyncTaskDao) {
+            this.mListener = listener;
+            mApplication = application;
+            this.mAsyncTaskDao = mAsyncTaskDao;
+        }
+
+        @Override
+        protected Integer doInBackground(Child... children) {
+            int numRowsUpdated = mAsyncTaskDao.update(children[0]);
+            if (numRowsUpdated != 0) {
+                SharedPreferences sharedPrefs = mApplication.getSharedPreferences("currentChild", Context.MODE_PRIVATE);
+                long childId = sharedPrefs.getLong("childId", -1);
+                if (childId != -1 && children[0]._id == childId) {
+                    sharedPrefs.edit().putString("childName", children[0].name).apply();
+                }
+            }
+            return numRowsUpdated;
+        }
+
+        @Override
+        protected void onPostExecute(Integer integer) {
+            super.onPostExecute(integer);
+
+            if (integer != 0) {
+
+                mListener.savedSuccessfully();
+//                Toast.makeText(mApplication, "Updated Child Profile", Toast.LENGTH_SHORT).show();
             }
         }
     }

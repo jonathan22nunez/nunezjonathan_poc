@@ -8,7 +8,7 @@
     <fragment
         android:id="@+id/navigation_overview"
         android:name="com.example.nunezjonathan_poc.ui.fragments.OverviewFragment"
-        android:label="Daily Overview"
+        android:label="Today's Overview"
         tools:layout="@layout/fragment_overview">
         <action
             android:id="@+id/action_navigation_overview_to_settingsFragment"

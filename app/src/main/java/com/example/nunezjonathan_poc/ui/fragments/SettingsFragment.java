@@ -135,6 +135,8 @@ public class SettingsFragment extends PreferenceFragmentCompat implements Shared
                                             if (familyId != null && getContext() != null) {
                                                 SharedPreferences sharedPrefs = getContext().getSharedPreferences("familyData", Context.MODE_PRIVATE);
                                                 sharedPrefs.edit().putString("family_id", familyId).apply();
+                                                sharedPrefs = getContext().getSharedPreferences("currentChild", Context.MODE_PRIVATE);
+                                                sharedPrefs.edit().putString("childName", "Child").apply();
                                             }
                                         } else {
                                             // Need to create a User profile and Family
@@ -200,6 +202,12 @@ public class SettingsFragment extends PreferenceFragmentCompat implements Shared
                 }
             } else {
                 sharedPreferences.edit().putString("family_id", null).apply();
+                if (getActivity() != null) {
+                    SharedPreferences sharedPrefs = getActivity().getSharedPreferences("currentChild", Context.MODE_PRIVATE);
+                    sharedPrefs.edit().putString("childName", "Child").apply();
+                    sharedPrefs.edit().putLong("childId", -1).apply();
+                    sharedPrefs.edit().putString("childDocumentId", null).apply();
+                }
             }
             linkedAccounts.setEnabled(enableStatus);
         }
@@ -239,14 +247,13 @@ public class SettingsFragment extends PreferenceFragmentCompat implements Shared
                                     sharedPrefs.edit().putString("childName", "Child").apply();
                                     if (OptionalServices.cloudSyncEnabled(getContext())) {
                                         final FirebaseUser user = FirestoreDatabase.getCurrentUser();
-                                        if (user != null) {
-//                                        OptionalServices.deleteUser(getContext());
+                                        if (user != null && getActivity() != null) {
                                             FirestoreDatabase.deleteChildren(getActivity().getApplication());
                                         }
+                                    } else {
+                                        Intent intent = new Intent(getActivity(), DeleteAllData.class);
+                                        DeleteAllData.enqueueWork(getContext(), intent);
                                     }
-
-                                    Intent intent = new Intent(getActivity(), DeleteAllData.class);
-                                    DeleteAllData.enqueueWork(getContext(), intent);
                                 }
                             }
                         });

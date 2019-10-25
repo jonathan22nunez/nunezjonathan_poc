@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.os.Handler;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -20,6 +21,7 @@ import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProviders;
 
 import com.example.nunezjonathan_poc.R;
+import com.example.nunezjonathan_poc.interfaces.EventActivityListener;
 import com.example.nunezjonathan_poc.interfaces.FeedingActivityListener;
 import com.example.nunezjonathan_poc.models.Event;
 import com.example.nunezjonathan_poc.services.NurseTimerService;
@@ -30,7 +32,9 @@ import com.example.nunezjonathan_poc.utils.TimeUtils;
 
 import java.util.Calendar;
 
-public class NurseFragment extends Fragment {
+import cdflynn.android.library.checkview.CheckView;
+
+public class NurseFragment extends Fragment implements EventActivityListener {
 
     public static final int DEFAULT = 0;
     public static final int LEFT_SIDE = 1;
@@ -38,11 +42,11 @@ public class NurseFragment extends Fragment {
 
     private FeedingViewModel feedingViewModel;
     private FeedingActivityListener mListener;
-    private Calendar datetime;
     public static int nursingSide = DEFAULT;
     private TextView timerLabel, manualEntryLabel;
     private ImageView leftSideIndicator, rightSideIndicator;
     private Button saveButton;
+    private CheckView checkView;
     private long millis = 0;
     private long leftMillis = 0;
     private long rightMillis = 0;
@@ -61,7 +65,7 @@ public class NurseFragment extends Fragment {
         @Override
         public void onClick(View v) {
             if (getActivity() != null) {
-                datetime = Calendar.getInstance();
+                SharedPreferences sharedPrefs = getActivity().getSharedPreferences("nursing", Context.MODE_PRIVATE);
                 Intent intent = new Intent(getActivity(), NurseTimerService.class);
                 if (NurseTimerService.isRunning) {
                     if (v.getId() == R.id.button_nurse_left_timer) {
@@ -81,6 +85,8 @@ public class NurseFragment extends Fragment {
                             setRightSide();
                         }
                     }
+
+                    sharedPrefs.edit().putInt("nursingSide", nursingSide).apply();
 
                 } else {
                     if (v.getId() == R.id.button_nurse_left_timer) {
@@ -113,11 +119,10 @@ public class NurseFragment extends Fragment {
         public void onClick(View v) {
             if (getActivity() != null) {
                 Event feedingEvent = new Event(Event.EventType.NURSE,
-                        CalendarUtils.toDatetimeString(datetime.getTime()),
+                        CalendarUtils.toDatetimeString(NurseTimerService.datetime.getTime()),
                         millis, leftMillis, rightMillis,
                         -1, -1, Event.Color.NONE, Event.Hardness.NONE);
-                feedingViewModel.insertFeedingEvent(feedingEvent);
-                resetUI();
+                feedingViewModel.insertFeedingEvent(NurseFragment.this, feedingEvent);
             }
         }
     };
@@ -150,6 +155,13 @@ public class NurseFragment extends Fragment {
         timerLabel = view.findViewById(R.id.textView_nurse_timer);
         leftSideIndicator = view.findViewById(R.id.left_indicator);
         rightSideIndicator = view.findViewById(R.id.right_indicator);
+        SharedPreferences sharedPrefs = view.getContext().getSharedPreferences("nursing", Context.MODE_PRIVATE);
+        int savedNursingSide = sharedPrefs.getInt("nursingSide", -1);
+        if (savedNursingSide == LEFT_SIDE) {
+            leftSideIndicator.setVisibility(View.VISIBLE);
+        } else if (savedNursingSide == RIGHT_SIDE) {
+            rightSideIndicator.setVisibility(View.VISIBLE);
+        }
         manualEntryLabel = view.findViewById(R.id.textView_manual_nurse_entry);
         saveButton = view.findViewById(R.id.button_save_nurse);
 
@@ -165,11 +177,16 @@ public class NurseFragment extends Fragment {
             }
         });
 
+        checkView = view.findViewById(R.id.check);
         saveButton.setOnClickListener(saveButtonClickListener);
     }
 
     private void resetUI() {
         nursingSide = DEFAULT;
+        if (getContext()!= null) {
+            SharedPreferences sharedPrefs = getContext().getSharedPreferences("nursing", Context.MODE_PRIVATE);
+            sharedPrefs.edit().putInt("nursingSide", -1).apply();
+        }
         millis = 0;
         leftMillis = 0;
         rightMillis = 0;
@@ -203,5 +220,25 @@ public class NurseFragment extends Fragment {
         if (getActivity() != null) {
             getActivity().unregisterReceiver(receiver);
         }
+    }
+
+    @Override
+    public void savedSuccessfully() {
+        saveButton.setVisibility(View.GONE);
+        checkView.check();
+        final Handler handler = new Handler();
+        handler.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                checkView.uncheck();
+                handler.postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        resetUI();
+//                        saveButton.setVisibility(View.VISIBLE);
+                    }
+                }, 500);
+            }
+        }, 1000);
     }
 }

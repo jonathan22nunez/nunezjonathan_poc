@@ -10,6 +10,7 @@ import androidx.lifecycle.MutableLiveData;
 import com.example.nunezjonathan_poc.daos.EventDao;
 import com.example.nunezjonathan_poc.databases.AppDatabase;
 import com.example.nunezjonathan_poc.databases.FirestoreDatabase;
+import com.example.nunezjonathan_poc.interfaces.EventActivityListener;
 import com.example.nunezjonathan_poc.models.Event;
 import com.example.nunezjonathan_poc.tasks.DatabaseDeleteTask;
 import com.example.nunezjonathan_poc.tasks.DatabaseInsertTask;
@@ -49,21 +50,24 @@ public class DiaperRepository {
                             .collection(FirestoreDatabase.COLLECTION_CHILDREN)
                             .document(String.valueOf(childDocumentId))
                             .collection(FirestoreDatabase.COLLECTION_EVENT)
-                            .whereEqualTo("eventType", Event.EventType.WET);
+                            .whereEqualTo("eventType", Event.EventType.WET)
+                            .limit(25);
                     Query poopyQuery = rootRef
                             .collection(FirestoreDatabase.COLLECTION_FAMILIES)
                             .document(familyId)
                             .collection(FirestoreDatabase.COLLECTION_CHILDREN)
                             .document(String.valueOf(childDocumentId))
                             .collection(FirestoreDatabase.COLLECTION_EVENT)
-                            .whereEqualTo("eventType", Event.EventType.POOPY);
+                            .whereEqualTo("eventType", Event.EventType.POOPY)
+                            .limit(25);
                     Query mixedQuery = rootRef
                             .collection(FirestoreDatabase.COLLECTION_FAMILIES)
                             .document(familyId)
                             .collection(FirestoreDatabase.COLLECTION_CHILDREN)
                             .document(String.valueOf(childDocumentId))
                             .collection(FirestoreDatabase.COLLECTION_EVENT)
-                            .whereEqualTo("eventType", Event.EventType.MIXED);
+                            .whereEqualTo("eventType", Event.EventType.MIXED)
+                            .limit(25);
 
                     Task wetQueryTask = wetQuery.get();
                     Task poopyQueryTask = poopyQuery.get();
@@ -119,11 +123,11 @@ public class DiaperRepository {
     }
 
 
-    public void insertDiaperEvent(Event event) {
+    public void insertDiaperEvent(EventActivityListener listener, Event event) {
         if (OptionalServices.cloudSyncEnabled(mApplication)) {
-            FirestoreDatabase.addEventToDB(mApplication, event);
+            FirestoreDatabase.addEventToDB(listener, mApplication, event);
         } else {
-            new DatabaseInsertTask(mDao, mApplication).execute(event);
+            new DatabaseInsertTask(listener, mDao, mApplication).execute(event);
         }
     }
 

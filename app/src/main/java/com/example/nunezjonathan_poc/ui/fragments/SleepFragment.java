@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.os.Handler;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -14,6 +15,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -23,6 +25,7 @@ import androidx.lifecycle.ViewModelProviders;
 import androidx.navigation.Navigation;
 
 import com.example.nunezjonathan_poc.R;
+import com.example.nunezjonathan_poc.interfaces.EventActivityListener;
 import com.example.nunezjonathan_poc.models.Event;
 import com.example.nunezjonathan_poc.services.SleepTimerService;
 import com.example.nunezjonathan_poc.ui.viewModels.SleepViewModel;
@@ -31,12 +34,14 @@ import com.example.nunezjonathan_poc.utils.TimeUtils;
 
 import java.util.Calendar;
 
-public class SleepFragment extends Fragment {
+import cdflynn.android.library.checkview.CheckView;
+
+public class SleepFragment extends Fragment implements EventActivityListener {
 
     private SleepViewModel sleepViewModel;
-    private Calendar datetime;
     private TextView timerLabel, manualEntryLabel;
     private Button timerButton, saveButton;
+    private CheckView checkView;
     private long millis = 0;
     private String childName;
 
@@ -60,9 +65,6 @@ public class SleepFragment extends Fragment {
                     manualEntryLabel.setVisibility(View.GONE);
                     saveButton.setVisibility(View.VISIBLE);
                 } else {
-                    if (millis == 0) {
-                        datetime = Calendar.getInstance();
-                    }
                     intent.putExtra(SleepTimerService.EXTRA_TIME_MILLIS, millis);
                     ContextCompat.startForegroundService(getActivity(), intent);
                     timerButton.setText(R.string.stop);
@@ -96,13 +98,12 @@ public class SleepFragment extends Fragment {
             if (getActivity() != null) {
                 Event sleepEvent = new Event(
                         Event.EventType.SLEEP,
-                        CalendarUtils.toDatetimeString(datetime.getTime()),
+                        CalendarUtils.toDatetimeString(SleepTimerService.datetime.getTime()),
                         millis,
                         -1, -1, -1, -1,
                         Event.Color.NONE,
                         Event.Hardness.NONE);
-                sleepViewModel.insertSleep(sleepEvent);
-                resetUI();
+                sleepViewModel.insertSleep(SleepFragment.this, sleepEvent);
             }
         }
     };
@@ -164,6 +165,8 @@ public class SleepFragment extends Fragment {
         timerButton.setOnClickListener(timerButtonClickListener);
         timerButton.setOnLongClickListener(timerButtonLongClickListener);
         manualEntryLabel.setOnClickListener(manualButtonClickListener);
+
+        checkView = view.findViewById(R.id.check);
         saveButton.setOnClickListener(saveButtonClickListener);
     }
 
@@ -196,5 +199,25 @@ public class SleepFragment extends Fragment {
         if (getActivity() != null) {
             getActivity().unregisterReceiver(receiver);
         }
+    }
+
+    @Override
+    public void savedSuccessfully() {
+        saveButton.setVisibility(View.GONE);
+        checkView.check();
+        final Handler handler = new Handler();
+        handler.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                checkView.uncheck();
+                handler.postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        resetUI();
+                    }
+                }, 500);
+            }
+        }, 1000);
+
     }
 }

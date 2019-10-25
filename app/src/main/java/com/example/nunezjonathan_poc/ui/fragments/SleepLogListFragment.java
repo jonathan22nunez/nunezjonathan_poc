@@ -7,6 +7,7 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -26,10 +27,14 @@ import com.example.nunezjonathan_poc.interfaces.SwipeCallback;
 import com.example.nunezjonathan_poc.models.Event;
 import com.example.nunezjonathan_poc.ui.viewModels.FirestoreViewModel;
 import com.example.nunezjonathan_poc.ui.viewModels.SleepViewModel;
+import com.example.nunezjonathan_poc.utils.CalendarUtils;
 import com.example.nunezjonathan_poc.utils.OptionalServices;
 import com.google.android.material.snackbar.Snackbar;
 
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 public class SleepLogListFragment extends Fragment implements ItemClickListener {
@@ -37,25 +42,45 @@ public class SleepLogListFragment extends Fragment implements ItemClickListener 
     private RecyclerView recyclerView;
     private EventAdapter adapter;
     private List<Event> sleepEvents = new ArrayList<>();
-    private FirestoreViewModel firestoreViewModel;
     private SleepViewModel sleepViewModel;
+    private TextView emptyTextView;
 
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        View root = inflater.inflate(R.layout.fragment_children_test, container, false);
+        final View root = inflater.inflate(R.layout.fragment_children_test, container, false);
         sleepViewModel = ViewModelProviders.of(this).get(SleepViewModel.class);
         if (sleepViewModel.getSleepList() != null) {
             sleepViewModel.getSleepList().observe(this, new Observer<List<Event>>() {
                 @Override
                 public void onChanged(List<Event> events) {
-                    sleepEvents = events;
-                    adapter = new EventAdapter(events);
-                    adapter.setItemClickListener(SleepLogListFragment.this);
+                    if (events.size() > 0) {
+                        Collections.sort(events, new Comparator<Event>() {
+                            @Override
+                            public int compare(Event o1, Event o2) {
+                                Calendar o1Datetime = CalendarUtils.stringToCalendar(o1.datetime);
+                                Calendar o2Datetime = CalendarUtils.stringToCalendar(o2.datetime);
+                                return o2Datetime.compareTo(o1Datetime);
+                            }
+                        });
+                        sleepEvents = events;
+                        Event event = new Event();
+                        event.eventType = -1;
+                        sleepEvents.add(0, event);
+                        adapter = new EventAdapter(events);
+                        adapter.setItemClickListener(SleepLogListFragment.this);
 
-                    recyclerView.setAdapter(adapter);
+                        recyclerView.setAdapter(adapter);
+                    } else {
+                        emptyTextView = root.findViewById(R.id.emptyTextView);
+                        emptyTextView.setVisibility(View.VISIBLE);
+                        recyclerView.setVisibility(View.GONE);
+                    }
                 }
             });
+        } else {
+            emptyTextView = root.findViewById(R.id.emptyTextView);
+            emptyTextView.setVisibility(View.VISIBLE);
         }
 
         return root;
@@ -90,10 +115,8 @@ public class SleepLogListFragment extends Fragment implements ItemClickListener 
                             @Override
                             public void onClick(View view) {
                                 // undo is selected, restore the deleted item
-                                sleepViewModel.insertSleep(deletedEvent);
-                                //restoreEvent(deletedEvent);
+                                sleepViewModel.insertSleep(null, deletedEvent);
                                 adapter.restoreItem(deletedEvent, deletedPosition);
-//                            adapter.restoreItem(deletedModel, deletedPosition);
                             }
                         });
                         snackbar.setActionTextColor(getResources().getColor(R.color.colorAccent, null));
@@ -109,25 +132,5 @@ public class SleepLogListFragment extends Fragment implements ItemClickListener 
 
     @Override
     public void onClick(View view, int position) {
-//        Event event = sleepEvents.get(position);
-//        Toast.makeText(getContext(), "Clicked Event..." + event.documentId, Toast.LENGTH_SHORT).show();
-    }
-
-    private void deleteEvent(Event eventToDelete) {
-        if (OptionalServices.cloudSyncEnabled(getContext()) && firestoreViewModel != null) {
-            firestoreViewModel.deleteEvent(getActivity().getApplication(), eventToDelete);
-        } else {
-            sleepViewModel.deleteSleep(eventToDelete);
-        }
-    }
-
-    private void restoreEvent(Event eventToRestore) {
-        if (getActivity() != null) {
-            if (OptionalServices.cloudSyncEnabled(getContext()) && firestoreViewModel != null) {
-                FirestoreDatabase.addEventToDB(getActivity().getApplication(), eventToRestore);
-            } else {
-                sleepViewModel.insertSleep(eventToRestore);
-            }
-        }
     }
 }

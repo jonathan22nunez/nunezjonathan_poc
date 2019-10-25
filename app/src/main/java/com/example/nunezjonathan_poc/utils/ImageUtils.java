@@ -86,7 +86,7 @@ public class ImageUtils {
         }
     }
 
-    private static File createImageFile(Context context) throws IOException {
+    public static File createImageFile(Context context) throws IOException {
         String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss", Locale.getDefault()).format(new Date());
         String imageFileName = "JPEG_" + timeStamp + "_";
         File storageDir = context.getExternalFilesDir(Environment.DIRECTORY_PICTURES);

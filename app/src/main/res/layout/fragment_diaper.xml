@@ -27,6 +27,17 @@
         app:layout_constraintStart_toStartOf="@id/guideline"
         android:layout_marginStart="40dp"/>
 
+    <cdflynn.android.library.checkview.CheckView
+        android:id="@+id/check"
+        android:layout_width="64dp"
+        android:layout_height="64dp"
+        app:checkView_strokeColor="@color/saveButtonColor"
+        app:checkView_strokeWidth="5dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintBottom_toTopOf="@id/textView_poopy_activity"
+        android:layout_marginBottom="75dp"/>
+
     <TextView
         android:id="@+id/textView_wet_activity"
         style="@style/TextButton"

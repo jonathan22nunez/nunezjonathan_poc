@@ -6,6 +6,7 @@ import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 
+import com.example.nunezjonathan_poc.interfaces.EventActivityListener;
 import com.example.nunezjonathan_poc.models.Health;
 import com.example.nunezjonathan_poc.repos.HealthRepository;
 import com.example.nunezjonathan_poc.utils.OptionalServices;
@@ -16,22 +17,20 @@ public class HealthViewModel extends AndroidViewModel {
 
     private final Application mApplication;
     private final HealthRepository mRepository;
-    private LiveData<List<Health>> healthList;
-//    private LiveData<List<Health>> healthRoom;
 
     public HealthViewModel(@NonNull Application application) {
         super(application);
         mApplication = application;
         mRepository = new HealthRepository(mApplication);
-        healthList = mRepository.getHealthList();
     }
 
     public LiveData<List<Health>> getHealthList() {
-        return healthList;
+        if (OptionalServices.cloudSyncEnabled(mApplication)) return mRepository.getHealthList();
+        else return mRepository.getHealthRoom();
     }
 
-    public void insertHealth(Health health) {
-        mRepository.insertHealthData(health);
+    public void insertHealth(EventActivityListener listener, Health health) {
+        mRepository.insertHealthData(listener, health);
     }
 
     public void deleteHealth(Health health) {

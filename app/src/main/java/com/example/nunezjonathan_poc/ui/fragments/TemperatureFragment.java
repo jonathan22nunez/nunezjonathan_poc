@@ -5,9 +5,11 @@ import android.app.TimePickerDialog;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.os.Handler;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.SeekBar;
@@ -21,6 +23,7 @@ import androidx.lifecycle.ViewModelProviders;
 import androidx.navigation.Navigation;
 
 import com.example.nunezjonathan_poc.R;
+import com.example.nunezjonathan_poc.interfaces.EventActivityListener;
 import com.example.nunezjonathan_poc.models.Health;
 import com.example.nunezjonathan_poc.ui.viewModels.HealthViewModel;
 import com.example.nunezjonathan_poc.utils.CalendarUtils;
@@ -28,7 +31,9 @@ import com.example.nunezjonathan_poc.utils.CalendarUtils;
 import java.util.Calendar;
 import java.util.Locale;
 
-public class TemperatureFragment extends Fragment {
+import cdflynn.android.library.checkview.CheckView;
+
+public class TemperatureFragment extends Fragment implements EventActivityListener {
 
     private HealthViewModel healthViewModel;
     private Calendar startDatetime;
@@ -36,6 +41,8 @@ public class TemperatureFragment extends Fragment {
     private EditText temperatureInput, notes;
     private SeekBar temperatureSB;
     private double temp = 98.6;
+    private Button saveButton;
+    private CheckView checkView;
 
     private View.OnClickListener dateClickListener = new View.OnClickListener() {
         @Override
@@ -113,8 +120,7 @@ public class TemperatureFragment extends Fragment {
                             notes.getText().toString(),
                             null, null, null, null, -1, null,
                             temp);
-                    healthViewModel.insertHealth(health);
-                    Navigation.findNavController(getActivity(), R.id.nav_host_fragment).popBackStack();
+                    healthViewModel.insertHealth(TemperatureFragment.this, health);
             }
         }
     };
@@ -165,6 +171,29 @@ public class TemperatureFragment extends Fragment {
 
         notes = view.findViewById(R.id.editText_notes);
 
-        view.findViewById(R.id.button_save_temperature).setOnClickListener(saveButtonClickListener);
+        checkView = view.findViewById(R.id.check);
+        saveButton = view.findViewById(R.id.button_save_temperature);
+        saveButton.setOnClickListener(saveButtonClickListener);
+    }
+
+    @Override
+    public void savedSuccessfully() {
+        saveButton.setVisibility(View.GONE);
+        checkView.check();
+        final Handler handler = new Handler();
+        handler.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                checkView.uncheck();
+                handler.postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        if (getActivity() != null) {
+                            Navigation.findNavController(getActivity(), R.id.nav_host_fragment).popBackStack();
+                        }
+                    }
+                }, 500);
+            }
+        }, 1000);
     }
 }

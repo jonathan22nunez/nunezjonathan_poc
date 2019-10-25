@@ -104,11 +104,31 @@ public class Health {
     public String toString() {
         switch (healthType) {
             case HealthType.SYMPTOM:
-                return symptom + " @ " + CalendarUtils.toTimeHMString(CalendarUtils.stringToCalendar(datetime));
+                if (symptom.isEmpty()) {
+                    return "Symptom";
+                } else {
+                    return symptom;
+                }
             case HealthType.MEDICATION:
-                return "Took " + drugName + " @ " + CalendarUtils.toTimeHMString(CalendarUtils.stringToCalendar(datetime));
+                if (drugName.isEmpty()) {
+                    return "Medication";
+                } else {
+                    StringBuilder sb = new StringBuilder();
+                    sb.append("Took ");
+                    sb.append(drugName);
+
+                    if (dosage > 0) {
+                        sb.append(" : ");
+                        sb.append(dosage);
+                        if (unit != null) {
+                            sb.append(unit);
+                        }
+                    }
+
+                    return sb.toString();
+                }
             case HealthType.TEMPERATURE:
-                return "Temperature was " + temperature + "F @ " + CalendarUtils.toTimeHMString(CalendarUtils.stringToCalendar(datetime));
+                return "Temperature was " + temperature + "F";
         }
 
         return super.toString();

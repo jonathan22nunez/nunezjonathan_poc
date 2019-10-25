@@ -11,10 +11,18 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"/>
 
-    <ViewStub
-        android:id="@android:id/empty"
+<!--    <ViewStub-->
+<!--        android:id="@android:id/empty"-->
+<!--        android:layout_width="match_parent"-->
+<!--        android:layout_height="match_parent"-->
+<!--        android:layout="@layout/empty_overview_list"/>-->
+
+    <TextView
+        android:id="@+id/emptyTextView"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout="@layout/empty_overview_list"/>
+        android:text="Nothing to show yet"
+        android:gravity="center"
+        android:visibility="gone"/>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

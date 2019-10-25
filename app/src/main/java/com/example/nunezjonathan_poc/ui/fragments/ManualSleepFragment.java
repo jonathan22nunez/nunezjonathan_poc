@@ -4,9 +4,11 @@ import android.app.DatePickerDialog;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.os.Handler;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.DatePicker;
 import android.widget.TextView;
 import android.widget.TimePicker;
@@ -18,6 +20,7 @@ import androidx.lifecycle.ViewModelProviders;
 import androidx.navigation.Navigation;
 
 import com.example.nunezjonathan_poc.R;
+import com.example.nunezjonathan_poc.interfaces.EventActivityListener;
 import com.example.nunezjonathan_poc.models.Event;
 import com.example.nunezjonathan_poc.ui.viewModels.SleepViewModel;
 import com.example.nunezjonathan_poc.utils.CalendarUtils;
@@ -25,12 +28,16 @@ import com.example.nunezjonathan_poc.utils.TimeUtils;
 
 import java.util.Calendar;
 
-public class ManualSleepFragment extends Fragment {
+import cdflynn.android.library.checkview.CheckView;
+
+public class ManualSleepFragment extends Fragment implements EventActivityListener {
 
     private SleepViewModel sleepViewModel;
     private TextView sleepDate;
     private TimePicker startTime, endTime;
     private Calendar datetime;
+    private Button saveButton;
+    private CheckView checkView;
 
     private final View.OnClickListener sleepDateClickListener = new View.OnClickListener() {
         @Override
@@ -71,7 +78,9 @@ public class ManualSleepFragment extends Fragment {
         startTime = view.findViewById(R.id.timePicker_startTime);
         endTime = view.findViewById(R.id.timePicker_endTime);
 
-        view.findViewById(R.id.button_save_manual_sleep).setOnClickListener(new View.OnClickListener() {
+        checkView = view.findViewById(R.id.check);
+        saveButton = view.findViewById(R.id.button_save_manual_sleep);
+        saveButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 if (getActivity() != null) {
@@ -83,8 +92,7 @@ public class ManualSleepFragment extends Fragment {
                                 CalendarUtils.toDatetimeString(datetime.getTime()),
                                 millis,
                                 -1, -1, -1, -1, Event.Color.NONE, Event.Hardness.NONE);
-                        sleepViewModel.insertSleep(sleepEvent);
-                        Navigation.findNavController(getActivity(), R.id.nav_host_fragment).popBackStack();
+                        sleepViewModel.insertSleep(ManualSleepFragment.this, sleepEvent);
                     }
                 }
             }
@@ -103,5 +111,26 @@ public class ManualSleepFragment extends Fragment {
         }
 
         return endMillis - startMillis;
+    }
+
+    @Override
+    public void savedSuccessfully() {
+        saveButton.setVisibility(View.GONE);
+        checkView.check();
+        final Handler handler = new Handler();
+        handler.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                checkView.uncheck();
+                handler.postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        if (getActivity() != null) {
+                            Navigation.findNavController(getActivity(), R.id.nav_host_fragment).popBackStack();
+                        }
+                    }
+                }, 500);
+            }
+        }, 1000);
     }
 }

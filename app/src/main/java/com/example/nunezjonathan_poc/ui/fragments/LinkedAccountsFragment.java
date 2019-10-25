@@ -107,14 +107,18 @@ public class LinkedAccountsFragment extends Fragment {
                     String messageToSend = "You have been asked to participate with " +
                             user.getDisplayName() + " to track a little one's activities using NüBaby. " +
                             "Download the app and use the provided code, found below, to " +
-                            "to link up and start tracking. \n\n" +
+                            "to link up and start tracking.\n\n" +
                             "Code: " + familyId;
-                    Intent intent = new Intent(Intent.ACTION_SENDTO);
-                    intent.setData(Uri.parse("smsto:"));  // This ensures only SMS apps respond
-                    intent.putExtra("sms_body", messageToSend);
-                    if (intent.resolveActivity(getContext().getPackageManager()) != null) {
-                        startActivity(intent);
-                    }
+//                    Intent intent = new Intent(Intent.ACTION_SENDTO);
+//                    intent.setData(Uri.parse("sms:"));  // This ensures only SMS apps respond
+//                    intent.putExtra("sms_body", messageToSend);
+//                    if (intent.resolveActivity(getContext().getPackageManager()) != null) {
+//                        startActivity(intent);
+//                    }
+                    Intent smsIntent = new Intent(Intent.ACTION_VIEW);
+                    smsIntent.setData(Uri.parse("sms:"));
+                    smsIntent.putExtra("sms_body", messageToSend);
+                    startActivity(smsIntent);
                 }
             }
             return true;

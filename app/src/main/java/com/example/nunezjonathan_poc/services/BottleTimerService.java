@@ -18,6 +18,8 @@ import com.example.nunezjonathan_poc.ui.activities.MainActivity;
 import com.example.nunezjonathan_poc.ui.fragments.NurseFragment;
 import com.example.nunezjonathan_poc.utils.TimeUtils;
 
+import java.util.Calendar;
+
 public class BottleTimerService extends Service {
 
     private static final String CHANNEL_ID = "BottleTimerServiceChannel";
@@ -25,6 +27,7 @@ public class BottleTimerService extends Service {
     public static final String ACTION_UPDATE_TIMER = "com.example.nunezjonathan_poc.UPDATE_BOTTLE_TIMER";
 
     public static boolean isRunning = false;
+    public static Calendar datetime;
 
     private NotificationCompat.Builder notificationBuilder;
     private NotificationManager notificationManager;
@@ -46,6 +49,7 @@ public class BottleTimerService extends Service {
         createTimerNotification();
 
         millis = intent.getLongExtra(EXTRA_TIME_MILLIS, 0);
+        datetime = Calendar.getInstance();
         runnable.run();
         isRunning = true;
         return START_NOT_STICKY;
@@ -62,7 +66,7 @@ public class BottleTimerService extends Service {
 
             notificationBuilder.setContentText(TimeUtils.timerHMS(millis));
 
-            notificationManager.notify(1, notificationBuilder.build());
+            notificationManager.notify(3, notificationBuilder.build());
 
             handler.postDelayed(this, 1000);
         }
@@ -112,6 +116,6 @@ public class BottleTimerService extends Service {
                 .setContentIntent(pendingIntent)
                 .setPriority(NotificationCompat.PRIORITY_DEFAULT);
 
-        startForeground(1, notificationBuilder.build());
+        startForeground(3, notificationBuilder.build());
     }
 }

@@ -13,6 +13,7 @@ import com.example.nunezjonathan_poc.databases.AppDatabase;
 import com.example.nunezjonathan_poc.databases.FirestoreDatabase;
 import com.example.nunezjonathan_poc.models.Event;
 import com.example.nunezjonathan_poc.tasks.DatabaseInsertTask;
+import com.example.nunezjonathan_poc.utils.CalendarUtils;
 import com.example.nunezjonathan_poc.utils.OptionalServices;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
@@ -21,6 +22,7 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QuerySnapshot;
 
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.List;
 
 public class OverviewRepository {
@@ -33,10 +35,14 @@ public class OverviewRepository {
     public OverviewRepository(Application application) {
         this.mApplication = application;
         mDao = AppDatabase.getDatabase(application).eventDao();
+    }
+
+    public MutableLiveData<List<Event>> getOverviewList() {
         SharedPreferences sharedPrefs = mApplication.getSharedPreferences("currentChild", Context.MODE_PRIVATE);
-        if (OptionalServices.cloudSyncEnabled(mApplication)) {
-            String familyId = FirestoreDatabase.getFamilyId(application);
-            if (familyId != null) {
+        Calendar today = Calendar.getInstance();
+        String todayString = CalendarUtils.toDateString(today.getTime());
+        String familyId = FirestoreDatabase.getFamilyId(mApplication);
+        if (familyId != null) {
             String childDocumentId = sharedPrefs.getString("childDocumentId", null);
             if (childDocumentId != null) {
                 FirebaseFirestore.getInstance()
@@ -45,6 +51,7 @@ public class OverviewRepository {
                         .collection(FirestoreDatabase.COLLECTION_CHILDREN)
                         .document(childDocumentId)
                         .collection(FirestoreDatabase.COLLECTION_EVENT)
+                        .whereGreaterThan("datetime", todayString)
                         .get()
                         .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
                             @Override
@@ -63,25 +70,26 @@ public class OverviewRepository {
                                 }
                             }
                         });
-            }
-            }
-        } else {
-            long childId = sharedPrefs.getLong("childId", -1);
-            if (childId != -1) {
-                mOverviewRoom = mDao.queryAllByChildId(childId);
+            } else {
+                mOverviewList = new MutableLiveData<>();
             }
         }
-    }
 
-    public MutableLiveData<List<Event>> getOverviewList() {
         return mOverviewList;
     }
 
     public LiveData<List<Event>> getOverviewRoom() {
+        SharedPreferences sharedPrefs = mApplication.getSharedPreferences("currentChild", Context.MODE_PRIVATE);
+
+        long childId = sharedPrefs.getLong("childId", -1);
+        if (childId != -1) {
+            mOverviewRoom = mDao.queryAllByChildId(childId);
+        }
+
         return mOverviewRoom;
     }
 
     public void insertEventData(Event event) {
-        new DatabaseInsertTask(mDao, mApplication).execute(event);
+        new DatabaseInsertTask(null, mDao, mApplication).execute(event);
     }
 }

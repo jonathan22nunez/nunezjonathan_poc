@@ -55,7 +55,6 @@ public class HealthFragment extends Fragment implements ItemClickListener {
     private FloatingActionButton fab_add_health, fab_add_symptom, fab_add_medication, fab_add_temperature;
     private Animation fab_open, fab_close, fab_rotate_clockwise, fab_rotate_counterclockwise;
     private boolean fabIsOpen = false;
-    private ListView healthListView;
     private RecyclerView recyclerView;
     private HealthAdapter adapter;
     private List<Health> healthList = new ArrayList<>();
@@ -63,52 +62,62 @@ public class HealthFragment extends Fragment implements ItemClickListener {
     private TextView lastMedication;
     private String childName;
     private HealthViewModel healthViewModel;
+    private TextView emptyTextView;
 
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         setHasOptionsMenu(true);
-        View root = inflater.inflate(R.layout.fragment_health, container, false);
+        final View root = inflater.inflate(R.layout.fragment_health, container, false);
             healthViewModel = ViewModelProviders.of(this).get(HealthViewModel.class);
             if (healthViewModel.getHealthList() != null) {
                 healthViewModel.getHealthList().observe(this, new Observer<List<Health>>() {
                     @Override
                     public void onChanged(List<Health> health) {
-                        healthList = health;
-                        if (getContext() != null) {
-                            Collections.sort(healthList, new Comparator<Health>() {
-                                @Override
-                                public int compare(Health o1, Health o2) {
-                                    Calendar o1Datetime = CalendarUtils.stringToCalendar(o1.datetime);
-                                    Calendar o2Datetime = CalendarUtils.stringToCalendar(o2.datetime);
-                                    return o2Datetime.compareTo(o1Datetime);
+                        emptyTextView = root.findViewById(R.id.emptyTextView);
+                        emptyTextView.setVisibility(View.GONE);
+                        if (health.size() > 0) {
+                            healthList = health;
+                            if (getContext() != null) {
+                                Collections.sort(healthList, new Comparator<Health>() {
+                                    @Override
+                                    public int compare(Health o1, Health o2) {
+                                        Calendar o1Datetime = CalendarUtils.stringToCalendar(o1.datetime);
+                                        Calendar o2Datetime = CalendarUtils.stringToCalendar(o2.datetime);
+                                        return o2Datetime.compareTo(o1Datetime);
+                                    }
+                                });
+
+                                adapter = new HealthAdapter(healthList);
+                                adapter.setItemClickListener(HealthFragment.this);
+                                recyclerView.setAdapter(adapter);
+
+                                for (Health h :
+                                        healthList) {
+                                    if (h.healthType == Health.HealthType.TEMPERATURE) {
+                                        String temperature = h.temperature + "F";
+                                        lastTemp.setText(temperature);
+                                        break;
+                                    }
                                 }
-                            });
 
-                            adapter = new HealthAdapter(healthList);
-                            adapter.setItemClickListener(HealthFragment.this);
-                            recyclerView.setAdapter(adapter);
-
-                            for (Health h :
-                                    healthList) {
-                                if (h.healthType == Health.HealthType.TEMPERATURE) {
-                                    String temperature = h.temperature + "F";
-                                    lastTemp.setText(temperature);
-                                    break;
+                                for (Health h :
+                                        healthList) {
+                                    if (h.healthType == Health.HealthType.MEDICATION) {
+                                        lastMedication.setText(h.toString());
+                                        break;
+                                    }
                                 }
                             }
-
-                            for (Health h :
-                                    healthList) {
-                                if (h.healthType == Health.HealthType.MEDICATION) {
-                                    lastMedication.setText(h.toString());
-                                    break;
-                                }
-                            }
+                        } else {
+                            emptyTextView.setVisibility(View.VISIBLE);
+                            recyclerView.setVisibility(View.GONE);
                         }
                     }
                 });
             }
+        emptyTextView = root.findViewById(R.id.emptyTextView);
+        emptyTextView.setVisibility(View.VISIBLE);
 
         return root;
     }
@@ -227,7 +236,7 @@ public class HealthFragment extends Fragment implements ItemClickListener {
                                 @Override
                                 public void onClick(View view) {
                                     // undo is selected, restore the deleted item
-                                    healthViewModel.insertHealth(deletedHealth);
+                                    healthViewModel.insertHealth(null, deletedHealth);
                                     //restoreEvent(deletedEvent);
                                     adapter.restoreItem(deletedHealth, deletedPosition);
 //                            adapter.restoreItem(deletedModel, deletedPosition);

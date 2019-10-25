@@ -16,7 +16,10 @@ import androidx.core.app.NotificationCompat;
 
 import com.example.nunezjonathan_poc.R;
 import com.example.nunezjonathan_poc.ui.activities.MainActivity;
+import com.example.nunezjonathan_poc.utils.CalendarUtils;
 import com.example.nunezjonathan_poc.utils.TimeUtils;
+
+import java.util.Calendar;
 
 public class SleepTimerService extends Service {
 
@@ -25,6 +28,7 @@ public class SleepTimerService extends Service {
     public static final String ACTION_UPDATE_TIMER = "com.example.nunezjonathan_poc.UPDATE_SLEEP_TIMER";
 
     public static boolean isRunning = false;
+    public static Calendar datetime;
 
     private NotificationCompat.Builder notificationBuilder;
     private NotificationManager notificationManager;
@@ -46,6 +50,7 @@ public class SleepTimerService extends Service {
         createTimerNotification();
 
         millis = intent.getLongExtra(EXTRA_TIME_MILLIS, 0);
+        datetime = Calendar.getInstance();
         runnable.run();
         isRunning = true;
         return START_NOT_STICKY;

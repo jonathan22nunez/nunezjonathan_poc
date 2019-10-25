@@ -4,9 +4,11 @@ import android.app.DatePickerDialog;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.os.Handler;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.DatePicker;
 import android.widget.SeekBar;
 import android.widget.TextView;
@@ -19,6 +21,7 @@ import androidx.lifecycle.ViewModelProviders;
 import androidx.navigation.Navigation;
 
 import com.example.nunezjonathan_poc.R;
+import com.example.nunezjonathan_poc.interfaces.EventActivityListener;
 import com.example.nunezjonathan_poc.models.Event;
 import com.example.nunezjonathan_poc.ui.viewModels.FeedingViewModel;
 import com.example.nunezjonathan_poc.utils.CalendarUtils;
@@ -27,13 +30,17 @@ import com.example.nunezjonathan_poc.utils.TimeUtils;
 import java.util.Calendar;
 import java.util.Locale;
 
-public class ManualBottleFragment extends Fragment {
+import cdflynn.android.library.checkview.CheckView;
+
+public class ManualBottleFragment extends Fragment implements EventActivityListener {
 
     private FeedingViewModel feedingViewModel;
     private TextView dateLabel, startAmount, endAmount;
     private TimePicker startTime, endTime;
     private Calendar datetime;
     private double startingAmount = 0, endingAmount = 0;
+    private Button saveButton;
+    private CheckView checkView;
 
     private final View.OnClickListener dateClickListener = new View.OnClickListener() {
         @Override
@@ -69,8 +76,7 @@ public class ManualBottleFragment extends Fragment {
                             -1, -1 ,
                             startingAmount, endingAmount,
                             Event.Color.NONE, Event.Hardness.NONE);
-                    feedingViewModel.insertFeedingEvent(feedingEvent);
-                    Navigation.findNavController(getActivity(), R.id.nav_host_fragment).popBackStack();
+                    feedingViewModel.insertFeedingEvent(ManualBottleFragment.this, feedingEvent);
                 }
             }
         }
@@ -136,7 +142,9 @@ public class ManualBottleFragment extends Fragment {
             }
         });
 
-        view.findViewById(R.id.button_save).setOnClickListener(saveButtonClickListener);
+        checkView = view.findViewById(R.id.check);
+        saveButton = view.findViewById(R.id.button_save);
+        saveButton.setOnClickListener(saveButtonClickListener);
 
     }
 
@@ -152,5 +160,26 @@ public class ManualBottleFragment extends Fragment {
         }
 
         return endMillis - startMillis;
+    }
+
+    @Override
+    public void savedSuccessfully() {
+        saveButton.setVisibility(View.GONE);
+        checkView.check();
+        final Handler handler = new Handler();
+        handler.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                checkView.uncheck();
+                handler.postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        if (getActivity() != null) {
+                            Navigation.findNavController(getActivity(), R.id.nav_host_fragment).popBackStack();
+                        }
+                    }
+                }, 500);
+            }
+        }, 1000);
     }
 }

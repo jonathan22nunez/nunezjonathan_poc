@@ -5,35 +5,42 @@ import android.app.TimePickerDialog;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.os.Handler;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.DatePicker;
 import android.widget.TextView;
 import android.widget.TimePicker;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.fragment.app.DialogFragment;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProviders;
 import androidx.navigation.Navigation;
 
 import com.example.nunezjonathan_poc.R;
+import com.example.nunezjonathan_poc.interfaces.EventActivityListener;
 import com.example.nunezjonathan_poc.models.Event;
 import com.example.nunezjonathan_poc.ui.viewModels.DiaperViewModel;
 import com.example.nunezjonathan_poc.utils.CalendarUtils;
 
 import java.util.Calendar;
 
-public class DiaperFragment extends Fragment {
+import cdflynn.android.library.checkview.CheckView;
+
+public class DiaperFragment extends Fragment implements EventActivityListener {
 
     private DiaperViewModel diaperViewModel;
     private Calendar startDatetime;
-    private TextView date, time;
+    private TextView date, time, wetEvent;
     private String childName;
+    private CheckView checkView;
 
     private View.OnClickListener dateClickListener = new View.OnClickListener() {
         @Override
@@ -84,7 +91,7 @@ public class DiaperFragment extends Fragment {
             if (getContext() != null) {
                 Event diaperEvent = new Event(Event.EventType.WET, CalendarUtils.toDatetimeString(startDatetime.getTime()),
                         -1, -1, -1, -1, -1, Event.Color.NONE, Event.Hardness.NONE);
-                diaperViewModel.insertDiaperEvent(diaperEvent);
+                diaperViewModel.insertDiaperEvent(DiaperFragment.this, diaperEvent);
             }
         }
     };
@@ -174,9 +181,30 @@ public class DiaperFragment extends Fragment {
         time.setText(CalendarUtils.toTimeHMString(startDatetime));
         time.setOnClickListener(timeClickListener);
 
-        view.findViewById(R.id.textView_wet_activity).setOnClickListener(wetClickListener);
+        checkView = view.findViewById(R.id.check);
+        wetEvent = view.findViewById(R.id.textView_wet_activity);
+        wetEvent.setOnClickListener(wetClickListener);
+
         view.findViewById(R.id.textView_poopy_activity).setOnClickListener(soiledClickListener);
         view.findViewById(R.id.textView_mixed_activity).setOnClickListener(soiledClickListener);
     }
 
+    @Override
+    public void savedSuccessfully() {
+        wetEvent.setVisibility(View.GONE);
+        checkView.check();
+        final Handler handler = new Handler();
+        handler.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                checkView.uncheck();
+                handler.postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        wetEvent.setVisibility(View.VISIBLE);
+                    }
+                }, 500);
+            }
+        }, 1000);
+    }
 }

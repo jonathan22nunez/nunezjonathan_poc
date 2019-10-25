@@ -7,6 +7,7 @@ import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 
+import com.example.nunezjonathan_poc.interfaces.EventActivityListener;
 import com.example.nunezjonathan_poc.models.Event;
 import com.example.nunezjonathan_poc.repos.DiaperRepository;
 import com.example.nunezjonathan_poc.utils.OptionalServices;
@@ -36,8 +37,8 @@ public class DiaperViewModel extends AndroidViewModel {
         }
     }
 
-    public void insertDiaperEvent(Event event) {
-        mRepository.insertDiaperEvent(event);
+    public void insertDiaperEvent(EventActivityListener listener, Event event) {
+        mRepository.insertDiaperEvent(listener, event);
     }
 
     public void deleteDiaper(Event event) {

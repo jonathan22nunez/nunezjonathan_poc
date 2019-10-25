@@ -7,6 +7,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Handler;
 import android.provider.MediaStore;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -15,6 +16,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
 import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.ImageView;
@@ -28,6 +30,7 @@ import androidx.lifecycle.ViewModelProviders;
 import androidx.navigation.Navigation;
 
 import com.example.nunezjonathan_poc.R;
+import com.example.nunezjonathan_poc.interfaces.EventActivityListener;
 import com.example.nunezjonathan_poc.models.Child;
 import com.example.nunezjonathan_poc.ui.viewModels.ChildrenViewModel;
 import com.example.nunezjonathan_poc.utils.CalendarUtils;
@@ -37,7 +40,9 @@ import com.theartofdev.edmodo.cropper.CropImageView;
 
 import java.util.Calendar;
 
-public class ChildrenDetailsFragment extends Fragment {
+import cdflynn.android.library.checkview.CheckView;
+
+public class ChildrenDetailsFragment extends Fragment implements EventActivityListener {
 
     private ChildrenViewModel mViewModel;
 
@@ -47,6 +52,11 @@ public class ChildrenDetailsFragment extends Fragment {
     private TextView deleteChildProfile;
     private Calendar calendar;
     private Uri imageUri;
+    private boolean isEditing = false;
+    private int editingChildId;
+    private String editingChildDocumentId;
+    private Button saveButton;
+    private CheckView checkView;
 
     private final View.OnClickListener imageClickListener = new View.OnClickListener() {
         @Override
@@ -85,17 +95,17 @@ public class ChildrenDetailsFragment extends Fragment {
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        setHasOptionsMenu(true);
+//        setHasOptionsMenu(true);
         View root = inflater.inflate(R.layout.fragment_children_details, container, false);
         mViewModel = ViewModelProviders.of(this).get(ChildrenViewModel.class);
         return root;
     }
 
-    @Override
-    public void onCreateOptionsMenu(@NonNull Menu menu, @NonNull MenuInflater inflater) {
-        super.onCreateOptionsMenu(menu, inflater);
-        inflater.inflate(R.menu.children_details_menu, menu);
-    }
+//    @Override
+//    public void onCreateOptionsMenu(@NonNull Menu menu, @NonNull MenuInflater inflater) {
+//        super.onCreateOptionsMenu(menu, inflater);
+//        inflater.inflate(R.menu.children_details_menu, menu);
+//    }
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
@@ -121,15 +131,28 @@ public class ChildrenDetailsFragment extends Fragment {
             childImage.setOnClickListener(imageClickListener);
             childDob.setOnClickListener(dobClickListener);
 
+            checkView = view.findViewById(R.id.check);
+
+            saveButton = view.findViewById(R.id.button_save);
+            saveButton.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    createChildProfile();
+                }
+            });
+
             showChildDetailsIfExists();
         }
     }
 
     private void showChildDetailsIfExists() {
         if (getArguments() != null) {
+            isEditing = true;
             final Child child = new Child(getArguments().getString("name"));
             child._id = getArguments().getInt("_id");
+            editingChildId = child._id;
             child.documentId = getArguments().getString("documentId");
+            editingChildDocumentId = child.documentId;
             child.dob = getArguments().getString("dob");
             child.sex = getArguments().getInt("sex");
             child.notes = getArguments().getString("notes");
@@ -139,8 +162,8 @@ public class ChildrenDetailsFragment extends Fragment {
             childDob.setText(child.dob);
             sexSelector.setSelection(child.sex);
             childNotes.setText(child.notes);
-            imageUri = Uri.parse(child.imageStringUri);
-            if (imageUri != null) {
+            if (child.imageStringUri != null && !child.imageStringUri.isEmpty()) {
+                imageUri = Uri.parse(child.imageStringUri);
                 childImage.setImageURI(imageUri);
             }
 
@@ -193,23 +216,29 @@ public class ChildrenDetailsFragment extends Fragment {
                 sexSelector.getSelectedItemPosition(),
                 childNotes.getText().toString(),
                 imageUriString);
-        mViewModel.insert(child);
-        if (getActivity() != null) {
-            Navigation.findNavController(getActivity(), R.id.nav_host_fragment).popBackStack();
+        if (isEditing) {
+            child._id = editingChildId;
+            child.documentId = editingChildDocumentId;
+            mViewModel.update(ChildrenDetailsFragment.this, child);
+        } else {
+            mViewModel.insert(ChildrenDetailsFragment.this, child);
         }
+//        if (getActivity() != null) {
+//            Navigation.findNavController(getActivity(), R.id.nav_host_fragment).popBackStack();
+//        }
     }
 
-    @Override
-    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
-        if (item.getItemId() == R.id.menu_item_save_child) {
-            if (verifyInputs()) {
-                createChildProfile();
-            }
-            return true;
-        }
-
-        return false;
-    }
+//    @Override
+//    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+//        if (item.getItemId() == R.id.menu_item_save_child) {
+//            if (verifyInputs()) {
+//                createChildProfile();
+//            }
+//            return true;
+//        }
+//
+//        return false;
+//    }
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
@@ -222,5 +251,26 @@ public class ChildrenDetailsFragment extends Fragment {
                 childImage.setImageURI(imageUri);
             }
         }
+    }
+
+    @Override
+    public void savedSuccessfully() {
+        saveButton.setVisibility(View.GONE);
+        checkView.check();
+        final Handler handler = new Handler();
+        handler.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                checkView.uncheck();
+                handler.postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        if (getActivity() != null) {
+                            Navigation.findNavController(getActivity(), R.id.nav_host_fragment).popBackStack();
+                        }
+                    }
+                }, 500);
+            }
+        }, 1000);
     }
 }

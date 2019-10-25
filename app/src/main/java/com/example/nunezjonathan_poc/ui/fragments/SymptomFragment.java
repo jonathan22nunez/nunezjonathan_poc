@@ -9,12 +9,16 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Handler;
+import android.provider.MediaStore;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.ImageButton;
@@ -24,28 +28,36 @@ import android.widget.TextView;
 import android.widget.TimePicker;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.core.content.FileProvider;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProviders;
 import androidx.navigation.Navigation;
 import com.example.nunezjonathan_poc.R;
+import com.example.nunezjonathan_poc.interfaces.EventActivityListener;
 import com.example.nunezjonathan_poc.models.Health;
 import com.example.nunezjonathan_poc.ui.viewModels.HealthViewModel;
 import com.example.nunezjonathan_poc.utils.CalendarUtils;
 import com.example.nunezjonathan_poc.utils.ImageUtils;
 
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Calendar;
 
-public class SymptomFragment extends Fragment {
+import cdflynn.android.library.checkview.CheckView;
+
+public class SymptomFragment extends Fragment implements EventActivityListener {
 
     private static final int REQUEST_CODE_CAMERA_IMAGE = 101;
-    private static final int REQUEST_CODE_GALLERY_IMAGE = 102;
 
     private HealthViewModel healthViewModel;
     private Calendar startDatetime;
     private TextView date, time;
     private EditText symptomInput, notes;
     private ArrayList<String> imageURIs = new ArrayList<>();
+    private Button saveButton;
+    private CheckView checkView;
 
     private LinearLayout imagesContainer;
 
@@ -131,8 +143,7 @@ public class SymptomFragment extends Fragment {
                             CalendarUtils.toDatetimeString(startDatetime.getTime()),
                             notes.getText().toString(), symptomInput.getText().toString(), imageURIs,
                             null, null, -1, null, -1);
-                    healthViewModel.insertHealth(health);
-                    Navigation.findNavController(getActivity(), R.id.nav_host_fragment).popBackStack();
+                    healthViewModel.insertHealth(SymptomFragment.this, health);
             }
         }
     };
@@ -154,7 +165,7 @@ public class SymptomFragment extends Fragment {
         date.setText(CalendarUtils.toDateString(startDatetime.getTime()));
         date.setOnClickListener(dateClickListener);
         time = view.findViewById(R.id.textView_time);
-        time.setText(CalendarUtils.toTimeHMSString(startDatetime));
+        time.setText(CalendarUtils.toTimeHMString(startDatetime));
         time.setOnClickListener(timeClickListener);
 
         symptomInput = view.findViewById(R.id.editText_symptom);
@@ -164,7 +175,9 @@ public class SymptomFragment extends Fragment {
 
         imagesContainer = view.findViewById(R.id.symptom_images_container);
 
-        view.findViewById(R.id.button_save_symptom).setOnClickListener(saveButtonClickListener);
+        checkView = view.findViewById(R.id.check);
+        saveButton = view.findViewById(R.id.button_save_symptom);
+        saveButton.setOnClickListener(saveButtonClickListener);
     }
 
     @Override
@@ -181,11 +194,28 @@ public class SymptomFragment extends Fragment {
                 //TODO for images from Gallery, create a Bitmap and save to local storage
                 // Bitmap bitmap = MediaStore.Images.Media.getBitmap(this.getContentResolver(), contentURI);
                 // String path = saveImage(bitmap);
-                if (data.getData() != null) {
+                if (data.getData() != null && getContext() != null) {
                     imagesContainer.addView(createImageButton(data.getData()));
 
-                    imageURIs.add(data.getData().toString());
-                } else if (data.getClipData() != null) {
+                    try {
+                        Bitmap bitmap = MediaStore.Images.Media.getBitmap(getContext().getContentResolver(), data.getData());
+
+                        File imageFile = ImageUtils.createImageFile(getContext());
+                        if (imageFile != null) {
+                            Uri imageUri = FileProvider.getUriForFile(getContext(), "com.example.nunezjonathan_poc.fileprovider", imageFile);
+
+                            FileOutputStream fos = new FileOutputStream(imageFile);
+                            bitmap.compress(Bitmap.CompressFormat.JPEG, 100, fos);
+                            fos.close();
+
+                            imageURIs.add(imageUri.toString());
+                        }
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+
+//                    imageURIs.add(data.getData().toString());
+                } else if (data.getClipData() != null && getContext() != null) {
                     ClipData clipData = data.getClipData();
 
                     for (int i = 0; i < clipData.getItemCount(); i++) {
@@ -193,7 +223,22 @@ public class SymptomFragment extends Fragment {
 
                         imagesContainer.addView(createImageButton(item.getUri()));
 
-                        imageURIs.add(item.getUri().toString());
+                        try {
+                            Bitmap bitmap = MediaStore.Images.Media.getBitmap(getContext().getContentResolver(), item.getUri());
+
+                            File imageFile = ImageUtils.createImageFile(getContext());
+                            if (imageFile != null) {
+                                Uri imageUri = FileProvider.getUriForFile(getContext(), "com.example.nunezjonathan_poc.fileprovider", imageFile);
+
+                                FileOutputStream fos = new FileOutputStream(imageFile);
+                                bitmap.compress(Bitmap.CompressFormat.JPEG, 100, fos);
+                                fos.close();
+
+                                imageURIs.add(imageUri.toString());
+                            }
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
                     }
                 }
             }
@@ -209,5 +254,26 @@ public class SymptomFragment extends Fragment {
         imageButton.setScaleType(ImageView.ScaleType.CENTER_CROP);
 
         return imageButton;
+    }
+
+    @Override
+    public void savedSuccessfully() {
+        saveButton.setVisibility(View.GONE);
+        checkView.check();
+        final Handler handler = new Handler();
+        handler.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                checkView.uncheck();
+                handler.postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        if (getActivity() != null) {
+                            Navigation.findNavController(getActivity(), R.id.nav_host_fragment).popBackStack();
+                        }
+                    }
+                }, 500);
+            }
+        }, 1000);
     }
 }

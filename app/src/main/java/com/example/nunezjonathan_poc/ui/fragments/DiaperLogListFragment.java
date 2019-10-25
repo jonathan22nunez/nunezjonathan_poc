@@ -1,17 +1,15 @@
 package com.example.nunezjonathan_poc.ui.fragments;
 
-import android.content.Context;
-import android.graphics.Color;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
-import androidx.fragment.app.ListFragment;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProviders;
 import androidx.recyclerview.widget.ItemTouchHelper;
@@ -19,20 +17,21 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.nunezjonathan_poc.R;
-import com.example.nunezjonathan_poc.adapters.DiaperListAdapter;
 import com.example.nunezjonathan_poc.adapters.EventAdapter;
-import com.example.nunezjonathan_poc.adapters.NurseListAdapter;
 import com.example.nunezjonathan_poc.databases.FirestoreDatabase;
 import com.example.nunezjonathan_poc.interfaces.ItemClickListener;
 import com.example.nunezjonathan_poc.interfaces.SwipeCallback;
 import com.example.nunezjonathan_poc.models.Event;
 import com.example.nunezjonathan_poc.ui.viewModels.DiaperViewModel;
 import com.example.nunezjonathan_poc.ui.viewModels.FirestoreViewModel;
+import com.example.nunezjonathan_poc.utils.CalendarUtils;
 import com.example.nunezjonathan_poc.utils.OptionalServices;
 import com.google.android.material.snackbar.Snackbar;
-import com.google.firebase.firestore.FirebaseFirestore;
 
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 public class DiaperLogListFragment extends Fragment implements ItemClickListener {
@@ -40,26 +39,46 @@ public class DiaperLogListFragment extends Fragment implements ItemClickListener
     private RecyclerView recyclerView;
     private EventAdapter adapter;
     private List<Event> diaperEvents = new ArrayList<>();
-    private FirestoreViewModel firestoreViewModel;
     private DiaperViewModel diaperViewModel;
+    private TextView emptyTextView;
 
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        View root = inflater.inflate(R.layout.fragment_children_test, container, false);
+        final View root = inflater.inflate(R.layout.fragment_children_test, container, false);
         diaperViewModel = ViewModelProviders.of(this).get(DiaperViewModel.class);
         if (diaperViewModel.getDiaperList() != null) {
             diaperViewModel.getDiaperList().observe(this, new Observer<List<Event>>() {
                 @Override
                 public void onChanged(List<Event> events) {
-                    //setListAdapter(new DiaperListAdapter(events));
-                    diaperEvents = events;
-                    adapter = new EventAdapter(getContext(), events);
-                    adapter.setItemClickListener(DiaperLogListFragment.this);
+                    if (events.size() > 0) {
+                        Collections.sort(events, new Comparator<Event>() {
+                            @Override
+                            public int compare(Event o1, Event o2) {
+                                Calendar o1Datetime = CalendarUtils.stringToCalendar(o1.datetime);
+                                Calendar o2Datetime = CalendarUtils.stringToCalendar(o2.datetime);
+                                return o2Datetime.compareTo(o1Datetime);
+                            }
+                        });
 
-                    recyclerView.setAdapter(adapter);
+                        diaperEvents = events;
+                        Event event = new Event();
+                        event.eventType = -1;
+                        diaperEvents.add(0, event);
+                        adapter = new EventAdapter(getContext(), events);
+                        adapter.setItemClickListener(DiaperLogListFragment.this);
+
+                        recyclerView.setAdapter(adapter);
+                    } else {
+                        emptyTextView = root.findViewById(R.id.emptyTextView);
+                        emptyTextView.setVisibility(View.VISIBLE);
+                        recyclerView.setVisibility(View.GONE);
+                    }
                 }
             });
+        } else {
+            emptyTextView = root.findViewById(R.id.emptyTextView);
+            emptyTextView.setVisibility(View.VISIBLE);
         }
 
         return root;
@@ -83,7 +102,8 @@ public class DiaperLogListFragment extends Fragment implements ItemClickListener
                 if (direction == ItemTouchHelper.LEFT) {
                     final Event deletedEvent = diaperEvents.get(position);
                     final int deletedPosition = position;
-                    deleteEvent(deletedEvent);
+                    diaperViewModel.deleteDiaper(deletedEvent);
+//                    deleteEvent(deletedEvent);
                     adapter.removeItem(position);
                     // showing snack bar with Undo option
                     if (getActivity() != null) {
@@ -92,7 +112,8 @@ public class DiaperLogListFragment extends Fragment implements ItemClickListener
                             @Override
                             public void onClick(View view) {
                                 // undo is selected, restore the deleted item
-                                restoreEvent(deletedEvent);
+//                                restoreEvent(deletedEvent);
+                                diaperViewModel.insertDiaperEvent(null, deletedEvent);
                                 adapter.restoreItem(deletedEvent, deletedPosition);
 //                            adapter.restoreItem(deletedModel, deletedPosition);
                             }
@@ -112,23 +133,5 @@ public class DiaperLogListFragment extends Fragment implements ItemClickListener
     public void onClick(View view, int position) {
         Event event = diaperEvents.get(position);
         Toast.makeText(getContext(), "Clicked Event..." + event.documentId, Toast.LENGTH_SHORT).show();
-    }
-
-    private void deleteEvent(Event eventToDelete) {
-        if (OptionalServices.cloudSyncEnabled(getContext()) && firestoreViewModel != null) {
-            firestoreViewModel.deleteEvent(getActivity().getApplication(), eventToDelete);
-        } else {
-            diaperViewModel.deleteDiaper(eventToDelete);
-        }
-    }
-
-    private void restoreEvent(Event eventToRestore) {
-        if (getActivity() != null) {
-            if (OptionalServices.cloudSyncEnabled(getContext()) && firestoreViewModel != null) {
-                FirestoreDatabase.addEventToDB(getActivity().getApplication(), eventToRestore);
-            } else {
-                diaperViewModel.insertDiaperEvent(eventToRestore);
-            }
-        }
     }
 }

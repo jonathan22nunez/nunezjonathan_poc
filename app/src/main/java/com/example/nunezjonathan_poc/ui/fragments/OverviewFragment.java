@@ -9,55 +9,72 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ArrayAdapter;
+import android.view.ViewStub;
+import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
-import androidx.fragment.app.ListFragment;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProviders;
 import androidx.navigation.Navigation;
-import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.nunezjonathan_poc.R;
 import com.example.nunezjonathan_poc.adapters.EventAdapter;
-import com.example.nunezjonathan_poc.adapters.NurseListAdapter;
-import com.example.nunezjonathan_poc.databases.FirestoreDatabase;
+import com.example.nunezjonathan_poc.adapters.OverviewAdapter;
 import com.example.nunezjonathan_poc.models.Event;
-import com.example.nunezjonathan_poc.ui.viewModels.EventViewModel;
-import com.example.nunezjonathan_poc.ui.viewModels.FirestoreViewModel;
 import com.example.nunezjonathan_poc.ui.viewModels.OverviewViewModel;
-import com.example.nunezjonathan_poc.utils.OptionalServices;
+import com.example.nunezjonathan_poc.utils.CalendarUtils;
 
-import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
-//TODO fix issue where selecting a Child doesn't update the Overview & Health list
 public class OverviewFragment extends Fragment {
 
     private RecyclerView recyclerView;
-    private EventAdapter adapter;
+    private OverviewAdapter adapter;
     private String childName;
+    private OverviewViewModel overviewViewModel;
+    private TextView emptyTextView;
 
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         setHasOptionsMenu(true);
-        View root = inflater.inflate(R.layout.fragment_children_test, container, false);
-        OverviewViewModel overviewViewModel = ViewModelProviders.of(this).get(OverviewViewModel.class);
+        final View root = inflater.inflate(R.layout.fragment_children_test, container, false);
+        overviewViewModel = ViewModelProviders.of(this).get(OverviewViewModel.class);
         if (overviewViewModel.getOverviewList() != null) {
             overviewViewModel.getOverviewList().observe(this, new Observer<List<Event>>() {
                 @Override
                 public void onChanged(List<Event> events) {
-                    if (getContext() != null) {
-                        adapter = new EventAdapter(getContext(), events);
+                    if (events.size() > 0) {
+                        if (getContext() != null) {
+                            Collections.sort(events, new Comparator<Event>() {
+                                @Override
+                                public int compare(Event o1, Event o2) {
+                                    Calendar o1Datetime = CalendarUtils.stringToCalendar(o1.datetime);
+                                    Calendar o2Datetime = CalendarUtils.stringToCalendar(o2.datetime);
+                                    return o2Datetime.compareTo(o1Datetime);
+                                }
+                            });
 
-                        recyclerView.setAdapter(adapter);
+                            adapter = new OverviewAdapter(getContext(), events);
+
+                            recyclerView.setAdapter(adapter);
+                        }
+                    } else {
+                        emptyTextView = root.findViewById(R.id.emptyTextView);
+                        emptyTextView.setVisibility(View.VISIBLE);
+                        recyclerView.setVisibility(View.GONE);
                     }
                 }
             });
+        } else {
+            emptyTextView = root.findViewById(R.id.emptyTextView);
+            emptyTextView.setVisibility(View.VISIBLE);
         }
 
         return root;
@@ -97,6 +114,7 @@ public class OverviewFragment extends Fragment {
         super.onViewCreated(view, savedInstanceState);
 
         recyclerView = view.findViewById(R.id.recycler_view);
+//        emptyTextView = view.findViewById(R.id.emptyTextView);
     }
 
     @Override

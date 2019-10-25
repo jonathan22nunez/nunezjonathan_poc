@@ -29,6 +29,9 @@ public class OptionalServices {
     public static void signOut(final Context context) {
         SharedPreferences sharedPrefs = context.getSharedPreferences("familyData", Context.MODE_PRIVATE);
         sharedPrefs.edit().putString("family_id", null).apply();
+        sharedPrefs = context.getSharedPreferences("currentChild", Context.MODE_PRIVATE);
+        sharedPrefs.edit().putString("childName", "Child").apply();
+        sharedPrefs.edit().putString("childDocumentId", null).apply();
         AuthUI.getInstance()
                 .signOut(context)
                 .addOnCompleteListener(new OnCompleteListener<Void>() {

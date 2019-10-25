@@ -14,6 +14,7 @@ import androidx.lifecycle.MutableLiveData;
 import com.example.nunezjonathan_poc.daos.HealthDao;
 import com.example.nunezjonathan_poc.databases.AppDatabase;
 import com.example.nunezjonathan_poc.databases.FirestoreDatabase;
+import com.example.nunezjonathan_poc.interfaces.EventActivityListener;
 import com.example.nunezjonathan_poc.models.Health;
 import com.example.nunezjonathan_poc.utils.OptionalServices;
 import com.google.firebase.firestore.EventListener;
@@ -36,10 +37,13 @@ public class HealthRepository {
     public HealthRepository(Application application) {
         this.mApplication = application;
         mDao = AppDatabase.getDatabase(mApplication).healthDao();
+    }
+
+    public LiveData<List<Health>> getHealthList() {
         SharedPreferences sharedPrefs = mApplication.getSharedPreferences("currentChild", Context.MODE_PRIVATE);
-        if (OptionalServices.cloudSyncEnabled(mApplication)) {
-            String familyId = FirestoreDatabase.getFamilyId(application);
-            if (familyId != null) {
+
+        String familyId = FirestoreDatabase.getFamilyId(mApplication);
+        if (familyId != null) {
             String childDocumentId = sharedPrefs.getString("childDocumentId", null);
             if (childDocumentId != null) {
                 FirebaseFirestore.getInstance()
@@ -59,37 +63,32 @@ public class HealthRepository {
                                         healthList.add(health);
                                     }
 
-                                    mHealthList.setValue(healthList);
+                                    mHealthList.postValue(healthList);
                                 }
                             }
                         });
             }
-            }
-        } else {
-            long childId = sharedPrefs.getLong("childId", -1);
-            if (childId != -1) {
-                mHealthRoom = mDao.queryAllByChildId(childId);
-            }
         }
+
+        return mHealthList;
     }
 
-    public LiveData<List<Health>> getHealthList() {
-        if (OptionalServices.cloudSyncEnabled(mApplication)) {
-            return mHealthList;
-        } else {
-            return mHealthRoom;
+    public LiveData<List<Health>> getHealthRoom() {
+        SharedPreferences sharedPrefs = mApplication.getSharedPreferences("currentChild", Context.MODE_PRIVATE);
+
+        long childId = sharedPrefs.getLong("childId", -1);
+        if (childId != -1) {
+            mHealthRoom = mDao.queryAllByChildId(childId);
         }
+
+        return mHealthRoom;
     }
 
-//    public LiveData<List<Health>> getHealthRoom() {
-//        return mHealthRoom;
-//    }
-
-    public void insertHealthData(Health health) {
+    public void insertHealthData(EventActivityListener listener, Health health) {
         if (OptionalServices.cloudSyncEnabled(mApplication)) {
-            FirestoreDatabase.addHealthToDB(mApplication, health);
+            FirestoreDatabase.addHealthToDB(listener, mApplication, health);
         } else {
-            new insertHealthAsyncTask(mDao, mApplication).execute(health);
+            new insertHealthAsyncTask(listener, mDao, mApplication).execute(health);
         }
     }
 
@@ -105,10 +104,12 @@ public class HealthRepository {
 
         private HealthDao mAsyncTaskDao;
         private Application mApplication;
+        private EventActivityListener mListener;
 
-        public insertHealthAsyncTask(HealthDao mAsyncTaskDao, Application mApplication) {
+        public insertHealthAsyncTask(EventActivityListener listener, HealthDao mAsyncTaskDao, Application mApplication) {
             this.mAsyncTaskDao = mAsyncTaskDao;
             this.mApplication = mApplication;
+            this.mListener = listener;
         }
 
         @Override
@@ -134,7 +135,9 @@ public class HealthRepository {
 
             long rowId = lsa.keyAt(0);
             if (rowId != -1) {
-                Toast.makeText(mApplication, "Successfully saved Health Event", Toast.LENGTH_SHORT).show();
+                if (mListener != null) {
+                    mListener.savedSuccessfully();
+                }
             }
         }
     }

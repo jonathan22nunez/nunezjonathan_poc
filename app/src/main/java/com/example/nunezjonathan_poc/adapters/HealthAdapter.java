@@ -12,6 +12,7 @@ import com.example.nunezjonathan_poc.R;
 import com.example.nunezjonathan_poc.interfaces.ItemClickListener;
 import com.example.nunezjonathan_poc.models.Event;
 import com.example.nunezjonathan_poc.models.Health;
+import com.example.nunezjonathan_poc.utils.CalendarUtils;
 
 import java.util.List;
 
@@ -66,19 +67,10 @@ public class HealthAdapter extends RecyclerView.Adapter<HealthAdapter.HealthView
 
     @Override
     public void onBindViewHolder(@NonNull HealthViewHolder holder, int position) {
-        switch (healthList.get(position).healthType) {
-            case Health.HealthType.SYMPTOM:
-                holder.healthType.setText("Symptom");
-                break;
-            case Health.HealthType.MEDICATION:
-                holder.healthType.setText("Medication");
-                break;
-            case Health.HealthType.TEMPERATURE:
-                holder.healthType.setText("Temperature");
-                break;
-        }
-
         holder.healthDescription.setText(healthList.get(position).toString());
+
+        String datetime = CalendarUtils.toDatetimeString(CalendarUtils.stringToCalendar(healthList.get(position).datetime).getTime());
+        holder.healthType.setText(datetime);
     }
 
     @Override

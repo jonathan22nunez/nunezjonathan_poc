@@ -82,20 +82,32 @@
         android:id="@+id/seekbar_hardness"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:max="2"
-        android:progress="1"
+        android:max="4"
+        android:progress="2"
         app:layout_constraintTop_toBottomOf="@id/textView_hardness_label"
         android:layout_marginTop="40dp"/>
 
     <TextView
+        android:id="@+id/label_Runny"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="@string/inputLabel_loose"
+        android:text="Runny"
         app:layout_constraintTop_toBottomOf="@id/seekbar_hardness"
         android:layout_marginTop="8dp"
         app:layout_constraintStart_toStartOf="@id/seekbar_hardness"/>
 
     <TextView
+        android:id="@+id/label_loose"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/inputLabel_loose"
+        app:layout_constraintTop_toBottomOf="@id/seekbar_hardness"
+        android:layout_marginTop="8dp"
+        app:layout_constraintStart_toEndOf="@id/label_Runny"
+        app:layout_constraintEnd_toStartOf="@id/label_soft"/>
+
+    <TextView
+        android:id="@+id/label_soft"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="@string/inputLabel_soft"
@@ -105,12 +117,34 @@
         app:layout_constraintEnd_toEndOf="parent"/>
 
     <TextView
+        android:id="@+id/label_chunky"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Chunky"
+        app:layout_constraintTop_toBottomOf="@id/seekbar_hardness"
+        android:layout_marginTop="8dp"
+        app:layout_constraintStart_toEndOf="@id/label_soft"
+        app:layout_constraintEnd_toStartOf="@id/label_hard"/>
+
+    <TextView
+        android:id="@+id/label_hard"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="@string/inputLabel_hard"
         app:layout_constraintTop_toBottomOf="@id/seekbar_hardness"
         android:layout_marginTop="8dp"
         app:layout_constraintEnd_toEndOf="@id/seekbar_hardness"/>
+
+    <cdflynn.android.library.checkview.CheckView
+        android:id="@+id/check"
+        android:layout_width="64dp"
+        android:layout_height="64dp"
+        app:checkView_strokeColor="@color/saveButtonColor"
+        app:checkView_strokeWidth="5dp"
+        app:layout_constraintTop_toBottomOf="@id/seekbar_hardness"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"/>
 
     <Button
         android:id="@+id/button_save_soiled_diaper"

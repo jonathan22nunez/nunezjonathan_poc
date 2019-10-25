@@ -6,6 +6,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.os.Handler;
 import android.preference.PreferenceManager;
 import android.util.Log;
 import android.view.View;
@@ -17,6 +18,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.constraintlayout.widget.ConstraintLayout;
+import androidx.core.app.ActivityCompat;
 
 import com.example.nunezjonathan_poc.R;
 import com.example.nunezjonathan_poc.databases.FirestoreDatabase;
@@ -57,32 +59,40 @@ public class LaunchActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_launch);
 
-        loginButton = findViewById(R.id.button_login);
-        loginButton.setOnClickListener(new View.OnClickListener() {
+        Handler handler = new Handler();
+        handler.postDelayed(new Runnable() {
             @Override
-            public void onClick(View v) {
-                signIn();
-            }
-        });
+            public void run() {
+                loginButton = findViewById(R.id.button_login);
+                loginButton.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        signIn();
+                    }
+                });
 
-        linkButton = findViewById(R.id.button_link);
-        linkButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                linkWithFamily();
-            }
-        });
+                linkButton = findViewById(R.id.button_link);
+                linkButton.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        linkWithFamily();
+                    }
+                });
 
-        if (OptionalServices.signInEnabled(this)) {
-            loginButton.setVisibility(View.VISIBLE);
-            linkButton.setVisibility(View.VISIBLE);
-            user = FirebaseAuth.getInstance().getCurrentUser();
-            if (user != null) {
-                beginApp();
+                if (OptionalServices.signInEnabled(LaunchActivity.this)) {
+                    loginButton.setVisibility(View.VISIBLE);
+                    linkButton.setVisibility(View.VISIBLE);
+                    user = FirebaseAuth.getInstance().getCurrentUser();
+                    if (user != null) {
+                        beginApp();
+                    }
+                } else {
+                    beginApp();
+                }
             }
-        } else {
-            beginApp();
-        }
+        }, 1000);
+
+
     }
 
     private void signIn() {
@@ -137,129 +147,276 @@ public class LaunchActivity extends AppCompatActivity {
 
             if (resultCode == RESULT_OK) {
                 user = FirestoreDatabase.getCurrentUser();
+                SharedPreferences userPrefs = getSharedPreferences("user", Context.MODE_PRIVATE);
+                String uid = userPrefs.getString("userId", null);
+                if (uid != null) {
+                    if (uid.equals(user.getUid())) {
+                        // Signed in successfully
+                        // Is CloudSyncEnabled?
+                        if (OptionalServices.cloudSyncEnabled(this)) {
+                            // Cloud Services are enabled
+                            // Are we linking to an existing Family?
+                            if (linkWithFamily) {
+                                // We are linking to an existing Family
+                                // Get the FamilyId from SharedPreferences
+                                SharedPreferences sharedPrefs = getSharedPreferences("familyData", Context.MODE_PRIVATE);
+                                final String familyId = sharedPrefs.getString("family_id", null);
+                                if (familyId != null) {
+                                    // Is the FamilyId code good?
+                                    // Test if code links to a database that exists
+                                    final DocumentReference docRef = FirebaseFirestore.getInstance()
+                                            .collection("families")
+                                            .document(familyId);
 
-                // Signed in successfully
-                // Is CloudSyncEnabled?
-                if (OptionalServices.cloudSyncEnabled(this)) {
-                    // Cloud Services are enabled
-                    // Are we linking to an existing Family?
-                    if (linkWithFamily) {
-                        // We are linking to an existing Family
-                        // Get the FamilyId from SharedPreferences
-                        SharedPreferences sharedPrefs = getSharedPreferences("familyData", Context.MODE_PRIVATE);
-                        final String familyId = sharedPrefs.getString("family_id", null);
-                        if (familyId != null) {
-                            // Is the FamilyId code good?
-                            // Test if code links to a database that exists
-                            final DocumentReference docRef = FirebaseFirestore.getInstance()
-                                    .collection("families")
-                                    .document(familyId);
+                                    docRef.get()
+                                            .addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+                                                @Override
+                                                public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                                                    if (task.isSuccessful() && task.getResult() != null) {
+                                                        // No error accessing Firebase
+                                                        final DocumentSnapshot document = task.getResult();
+                                                        if (document.exists()) {
+                                                            // Database exists, this is a valid code
+                                                            // Create User profile using FamilyId
+                                                            Map<String, Object> userDetails = new HashMap<>();
+                                                            userDetails.put("family_id", familyId);
 
-                            docRef.get()
+                                                            // Create User profile
+                                                            FirebaseFirestore.getInstance()
+                                                                    .collection("users")
+                                                                    .document(user.getUid())
+                                                                    .set(userDetails)
+                                                                    .addOnSuccessListener(new OnSuccessListener<Void>() {
+                                                                        @Override
+                                                                        public void onSuccess(Void aVoid) {
+                                                                            // Successfully created User profile
+
+                                                                            // Update the family document
+                                                                            Map<String, Object> documentMap = document.getData();
+                                                                            if (documentMap != null) {
+                                                                                Map<String, Object> memberDetails = new HashMap<>();
+                                                                                if (user.getDisplayName() != null)
+                                                                                    memberDetails.put("name", user.getDisplayName());
+                                                                                if (user.getEmail() != null)
+                                                                                    memberDetails.put("email", user.getEmail());
+                                                                                memberDetails.put("role", "member");
+
+                                                                                Map<String, Object> members = (Map<String, Object>) documentMap.get("members");
+                                                                                if (members != null) {
+
+                                                                                    members.put(user.getUid(), memberDetails);
+
+                                                                                    docRef.update("members", members);
+                                                                                } else {
+                                                                                    members = new HashMap<>();
+                                                                                    members.put(user.getUid(), memberDetails);
+                                                                                    Map<String, Object> docData = new HashMap<>();
+                                                                                    docData.put("members", members);
+                                                                                    docRef.update(docData);
+                                                                                }
+                                                                            }
+
+                                                                            beginApp();
+                                                                        }
+                                                                    });
+                                                        } else {
+                                                            AlertDialog.Builder builder1 = new AlertDialog.Builder(LaunchActivity.this);
+                                                            builder1.setTitle("Uh-Oh");
+                                                            builder1.setMessage("Looks like the code you provided didn't work.\n" +
+                                                                    "Check your code, and try again.");
+                                                            builder1.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                                                                @Override
+                                                                public void onClick(DialogInterface dialog, int which) {
+                                                                    AuthUI.getInstance()
+                                                                            .signOut(LaunchActivity.this);
+                                                                }
+                                                            });
+                                                            AlertDialog alertDialog = builder1.create();
+                                                            alertDialog.show();
+                                                        }
+                                                    } else {
+                                                        Log.i("TestFirebase", "Error getting firebase");
+                                                    }
+                                                }
+                                            })
+                                            .addOnFailureListener(new OnFailureListener() {
+                                                @Override
+                                                public void onFailure(@NonNull Exception e) {
+                                                    e.printStackTrace();
+                                                }
+                                            });
+                                }
+                            } else {
+                                // Does the user have a User profile in the cloud? (answer should always be 'yes'
+                                FirebaseFirestore.getInstance()
+                                        .collection("users")
+                                        .document(user.getUid())
+                                        .get()
+                                        .addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+                                            @Override
+                                            public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                                                if (task.isSuccessful() && task.getResult() != null) {
+                                                    // No error accessing Firebase
+                                                    DocumentSnapshot document = task.getResult();
+                                                    if (document.exists()) {
+                                                        // The user has an existing User profile in the cloud (expected)
+                                                        // Get the user's 'familyId' and save to SharedPreferences
+                                                        SharedPreferences sharedPreferences = getSharedPreferences("familyData", Context.MODE_PRIVATE);
+                                                        sharedPreferences.edit().putString("family_id", (String) document.get("family_id")).apply();
+
+                                                        beginApp();
+                                                    }
+                                                    //TODO later on implement else{} to handle no data retrieved for user
+                                                }
+                                            }
+                                        });
+                            }
+                        } else {
+                            // Cloud Services are disabled
+
+                            beginApp();
+                        }
+                    }
+                    else {
+                        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+                        builder.setTitle("Incorrect Login");
+                        builder.setMessage("The account you used to login isn't a match. Please try another account.");
+                        builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                AuthUI.getInstance().signOut(LaunchActivity.this);
+                            }
+                        });
+                        AlertDialog alertDialog = builder.create();
+                        alertDialog.show();
+                    }
+                } else {
+                    userPrefs.edit().putString("userId", user.getUid()).apply();
+                    // Signed in successfully
+                    // Is CloudSyncEnabled?
+                    if (OptionalServices.cloudSyncEnabled(this)) {
+                        // Cloud Services are enabled
+                        // Are we linking to an existing Family?
+                        if (linkWithFamily) {
+                            // We are linking to an existing Family
+                            // Get the FamilyId from SharedPreferences
+                            SharedPreferences sharedPrefs = getSharedPreferences("familyData", Context.MODE_PRIVATE);
+                            final String familyId = sharedPrefs.getString("family_id", null);
+                            if (familyId != null) {
+                                // Is the FamilyId code good?
+                                // Test if code links to a database that exists
+                                final DocumentReference docRef = FirebaseFirestore.getInstance()
+                                        .collection("families")
+                                        .document(familyId);
+
+                                docRef.get()
+                                        .addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+                                            @Override
+                                            public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                                                if (task.isSuccessful() && task.getResult() != null) {
+                                                    // No error accessing Firebase
+                                                    final DocumentSnapshot document = task.getResult();
+                                                    if (document.exists()) {
+                                                        // Database exists, this is a valid code
+                                                        // Create User profile using FamilyId
+                                                        Map<String, Object> userDetails = new HashMap<>();
+                                                        userDetails.put("family_id", familyId);
+
+                                                        // Create User profile
+                                                        FirebaseFirestore.getInstance()
+                                                                .collection("users")
+                                                                .document(user.getUid())
+                                                                .set(userDetails)
+                                                                .addOnSuccessListener(new OnSuccessListener<Void>() {
+                                                                    @Override
+                                                                    public void onSuccess(Void aVoid) {
+                                                                        // Successfully created User profile
+
+                                                                        // Update the family document
+                                                                        Map<String, Object> documentMap = document.getData();
+                                                                        if (documentMap != null) {
+                                                                            Map<String, Object> memberDetails = new HashMap<>();
+                                                                            if (user.getDisplayName() != null)
+                                                                                memberDetails.put("name", user.getDisplayName());
+                                                                            if (user.getEmail() != null)
+                                                                                memberDetails.put("email", user.getEmail());
+                                                                            memberDetails.put("role", "member");
+
+                                                                            Map<String, Object> members = (Map<String, Object>) documentMap.get("members");
+                                                                            if (members != null) {
+
+                                                                                members.put(user.getUid(), memberDetails);
+
+                                                                                docRef.update("members", members);
+                                                                            } else {
+                                                                                members = new HashMap<>();
+                                                                                members.put(user.getUid(), memberDetails);
+                                                                                Map<String, Object> docData = new HashMap<>();
+                                                                                docData.put("members", members);
+                                                                                docRef.update(docData);
+                                                                            }
+                                                                        }
+
+                                                                        beginApp();
+                                                                    }
+                                                                });
+                                                    } else {
+                                                        AlertDialog.Builder builder1 = new AlertDialog.Builder(LaunchActivity.this);
+                                                        builder1.setTitle("Uh-Oh");
+                                                        builder1.setMessage("Looks like the code you provided didn't work.\n" +
+                                                                "Check your code, and try again.");
+                                                        builder1.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                                                            @Override
+                                                            public void onClick(DialogInterface dialog, int which) {
+                                                                AuthUI.getInstance()
+                                                                        .signOut(LaunchActivity.this);
+                                                            }
+                                                        });
+                                                        AlertDialog alertDialog = builder1.create();
+                                                        alertDialog.show();
+                                                    }
+                                                } else {
+                                                    Log.i("TestFirebase", "Error getting firebase");
+                                                }
+                                            }
+                                        })
+                                        .addOnFailureListener(new OnFailureListener() {
+                                            @Override
+                                            public void onFailure(@NonNull Exception e) {
+                                                e.printStackTrace();
+                                            }
+                                        });
+                            }
+                        } else {
+                            // Does the user have a User profile in the cloud? (answer should always be 'yes'
+                            FirebaseFirestore.getInstance()
+                                    .collection("users")
+                                    .document(user.getUid())
+                                    .get()
                                     .addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
                                         @Override
                                         public void onComplete(@NonNull Task<DocumentSnapshot> task) {
                                             if (task.isSuccessful() && task.getResult() != null) {
                                                 // No error accessing Firebase
-                                                final DocumentSnapshot document = task.getResult();
+                                                DocumentSnapshot document = task.getResult();
                                                 if (document.exists()) {
-                                                    // Database exists, this is a valid code
-                                                    // Create User profile using FamilyId
-                                                    Map<String, Object> userDetails = new HashMap<>();
-                                                    userDetails.put("family_id", familyId);
+                                                    // The user has an existing User profile in the cloud (expected)
+                                                    // Get the user's 'familyId' and save to SharedPreferences
+                                                    SharedPreferences sharedPreferences = getSharedPreferences("familyData", Context.MODE_PRIVATE);
+                                                    sharedPreferences.edit().putString("family_id", (String) document.get("family_id")).apply();
 
-                                                    // Create User profile
-                                                    FirebaseFirestore.getInstance()
-                                                            .collection("users")
-                                                            .document(user.getUid())
-                                                            .set(userDetails)
-                                                            .addOnSuccessListener(new OnSuccessListener<Void>() {
-                                                                @Override
-                                                                public void onSuccess(Void aVoid) {
-                                                                    // Successfully created User profile
-
-                                                                    // Update the family document
-                                                                    Map<String, Object> documentMap = document.getData();
-                                                                    if (documentMap != null) {
-                                                                        Map<String, Object> memberDetails = new HashMap<>();
-                                                                        if (user.getDisplayName() != null) memberDetails.put("name", user.getDisplayName());
-                                                                        if (user.getEmail() != null) memberDetails.put("email", user.getEmail());
-                                                                        memberDetails.put("role", "member");
-
-                                                                        Map<String, Object> members = (Map<String, Object>) documentMap.get("members");
-                                                                        if (members != null) {
-
-                                                                            members.put(user.getUid(), memberDetails);
-
-                                                                            docRef.update("members", members);
-                                                                        } else {
-                                                                            members = new HashMap<>();
-                                                                            members.put(user.getUid(), memberDetails);
-                                                                            Map<String, Object> docData = new HashMap<>();
-                                                                            docData.put("members", members);
-                                                                            docRef.update(docData);
-                                                                        }
-                                                                    }
-
-                                                                    beginApp();
-                                                                }
-                                                            });
-                                                } else {
-                                                    AlertDialog.Builder builder1 = new AlertDialog.Builder(LaunchActivity.this);
-                                                    builder1.setTitle("Uh-Oh");
-                                                    builder1.setMessage("Looks like the code you provided didn't work.\n" +
-                                                            "Check your code, and try again.");
-                                                    builder1.setPositiveButton("OK", new DialogInterface.OnClickListener() {
-                                                        @Override
-                                                        public void onClick(DialogInterface dialog, int which) {
-                                                            AuthUI.getInstance()
-                                                                    .signOut(LaunchActivity.this);
-                                                        }
-                                                    });
-                                                    AlertDialog alertDialog = builder1.create();
-                                                    alertDialog.show();
+                                                    beginApp();
                                                 }
-                                            } else {
-                                                Log.i("TestFirebase", "Error getting firebase");
+                                                //TODO later on implement else{} to handle no data retrieved for user
                                             }
-                                        }
-                                    })
-                                    .addOnFailureListener(new OnFailureListener() {
-                                        @Override
-                                        public void onFailure(@NonNull Exception e) {
-                                            e.printStackTrace();
                                         }
                                     });
                         }
                     } else {
-                        // Does the user have a User profile in the cloud? (answer should always be 'yes'
-                        FirebaseFirestore.getInstance()
-                                .collection("users")
-                                .document(user.getUid())
-                                .get()
-                                .addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
-                                    @Override
-                                    public void onComplete(@NonNull Task<DocumentSnapshot> task) {
-                                        if (task.isSuccessful() && task.getResult() != null) {
-                                            // No error accessing Firebase
-                                            DocumentSnapshot document = task.getResult();
-                                            if (document.exists()) {
-                                                // The user has an existing User profile in the cloud (expected)
-                                                // Get the user's 'familyId' and save to SharedPreferences
-                                                SharedPreferences sharedPreferences = getSharedPreferences("familyData", Context.MODE_PRIVATE);
-                                                sharedPreferences.edit().putString("familyId", (String) document.get("family_id")).apply();
+                        // Cloud Services are disabled
 
-                                                beginApp();
-                                            }
-                                            //TODO later on implement else{} to handle no data retrieve for user
-                                        }
-                                    }
-                                });
+                        beginApp();
                     }
-                } else {
-                    // Cloud Services are disabled
-
-                    beginApp();
                 }
             } else {
                 if (response != null && response.getError() != null) {
@@ -271,6 +428,8 @@ public class LaunchActivity extends AppCompatActivity {
 
     private void beginApp() {
         Intent intent = new Intent(this, MainActivity.class);
+        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
         startActivity(intent);
+        ActivityCompat.finishAffinity(this);
     }
 }

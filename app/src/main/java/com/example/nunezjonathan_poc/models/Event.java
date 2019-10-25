@@ -47,12 +47,14 @@ public class Event {
         int RED = R.drawable.red_poo;
     }
 
-    @StringDef({Hardness.NONE, Hardness.LOOSE, Hardness.SOFT, Hardness.HARD})
+    @StringDef({Hardness.NONE, Hardness.RUNNY, Hardness.LOOSE, Hardness.SOFT, Hardness.CHUNKY, Hardness.HARD})
     @Retention(RetentionPolicy.SOURCE)
     public @interface Hardness {
         String NONE = "";
+        String RUNNY = "Runny";
         String LOOSE = "Loose";
         String SOFT = "Soft";
+        String CHUNKY = "Chunky";
         String HARD = "Hard";
     }
 

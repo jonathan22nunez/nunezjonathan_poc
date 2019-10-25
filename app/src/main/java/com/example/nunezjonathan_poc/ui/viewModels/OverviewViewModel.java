@@ -16,19 +16,16 @@ import java.util.List;
 public class OverviewViewModel extends AndroidViewModel {
 
     private final Application mApplication;
-    private MutableLiveData<List<Event>> overviewList;
-    private LiveData<List<Event>> overviewRoom;
+    private final OverviewRepository mRepository;
 
     public OverviewViewModel(@NonNull Application application) {
         super(application);
         mApplication = application;
-        OverviewRepository mRepository = new OverviewRepository(mApplication);
-        overviewList = mRepository.getOverviewList();
-        overviewRoom = mRepository.getOverviewRoom();
+        mRepository = new OverviewRepository(mApplication);
     }
 
     public LiveData<List<Event>> getOverviewList() {
-        if (OptionalServices.cloudSyncEnabled(mApplication)) return overviewList;
-        else return overviewRoom;
+        if (OptionalServices.cloudSyncEnabled(mApplication)) return mRepository.getOverviewList();
+        else return mRepository.getOverviewRoom();
     }
 }

@@ -1,9 +1,11 @@
 package com.example.nunezjonathan_poc.ui.fragments;
 
 import android.os.Bundle;
+import android.os.Handler;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.SeekBar;
 
@@ -14,15 +16,20 @@ import androidx.lifecycle.ViewModelProviders;
 import androidx.navigation.Navigation;
 
 import com.example.nunezjonathan_poc.R;
+import com.example.nunezjonathan_poc.interfaces.EventActivityListener;
 import com.example.nunezjonathan_poc.models.Event;
 import com.example.nunezjonathan_poc.ui.viewModels.DiaperViewModel;
 
-public class SoiledDiaperFragment extends Fragment {
+import cdflynn.android.library.checkview.CheckView;
+
+public class SoiledDiaperFragment extends Fragment implements EventActivityListener {
 
     private DiaperViewModel diaperViewModel;
     private ImageView black, yellow, brown, green, orange, red;
     private int colorSelected = Event.Color.NONE;
     private String hardnessSelected = Event.Hardness.LOOSE;
+    private Button saveButton;
+    private CheckView checkView;
 
     private View.OnClickListener colorClickListener = new View.OnClickListener() {
         @Override
@@ -67,8 +74,7 @@ public class SoiledDiaperFragment extends Fragment {
 
                 Event diaperEvent = new Event(eventType, datetime,
                         -1, -1, -1, -1, -1, colorSelected, hardnessSelected);
-                diaperViewModel.insertDiaperEvent(diaperEvent);
-                Navigation.findNavController(getActivity(), R.id.nav_host_fragment).popBackStack();
+                diaperViewModel.insertDiaperEvent(SoiledDiaperFragment.this, diaperEvent);
             }
         }
     };
@@ -103,10 +109,14 @@ public class SoiledDiaperFragment extends Fragment {
             @Override
             public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
                 if (progress == 0) {
-                    hardnessSelected = Event.Hardness.LOOSE;
+                    hardnessSelected = Event.Hardness.RUNNY;
                 } else if (progress == 1) {
-                    hardnessSelected = Event.Hardness.SOFT;
+                    hardnessSelected = Event.Hardness.LOOSE;
                 } else if (progress == 2) {
+                    hardnessSelected = Event.Hardness.SOFT;
+                } else if (progress == 3) {
+                    hardnessSelected = Event.Hardness.CHUNKY;
+                } else if (progress == 4) {
                     hardnessSelected = Event.Hardness.HARD;
                 }
             }
@@ -122,7 +132,9 @@ public class SoiledDiaperFragment extends Fragment {
             }
         });
 
-        view.findViewById(R.id.button_save_soiled_diaper).setOnClickListener(saveButtonClickListener);
+        checkView = view.findViewById(R.id.check);
+        saveButton = view.findViewById(R.id.button_save_soiled_diaper);
+        saveButton.setOnClickListener(saveButtonClickListener);
     }
 
     private void resetImageViews() {
@@ -132,5 +144,26 @@ public class SoiledDiaperFragment extends Fragment {
         green.setBackground(null);
         orange.setBackground(null);
         red.setBackground(null);
+    }
+
+    @Override
+    public void savedSuccessfully() {
+        saveButton.setVisibility(View.GONE);
+        checkView.check();
+        final Handler handler = new Handler();
+        handler.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                checkView.uncheck();
+                handler.postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        if (getActivity() != null) {
+                            Navigation.findNavController(getActivity(), R.id.nav_host_fragment).popBackStack();
+                        }
+                    }
+                }, 500);
+            }
+        }, 1000);
     }
 }

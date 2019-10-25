@@ -6,6 +6,7 @@ import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 
+import com.example.nunezjonathan_poc.interfaces.EventActivityListener;
 import com.example.nunezjonathan_poc.models.Event;
 import com.example.nunezjonathan_poc.repos.SleepRepository;
 import com.example.nunezjonathan_poc.utils.OptionalServices;
@@ -35,8 +36,8 @@ public class SleepViewModel extends AndroidViewModel {
         }
     }
 
-    public void insertSleep(Event event) {
-        mRepository.insertSleepEvent(event);
+    public void insertSleep(EventActivityListener listener, Event event) {
+        mRepository.insertSleepEvent(listener, event);
     }
 
     public void deleteSleep(Event event) {

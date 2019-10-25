@@ -11,9 +11,11 @@ import androidx.lifecycle.MutableLiveData;
 import com.example.nunezjonathan_poc.daos.EventDao;
 import com.example.nunezjonathan_poc.databases.AppDatabase;
 import com.example.nunezjonathan_poc.databases.FirestoreDatabase;
+import com.example.nunezjonathan_poc.interfaces.EventActivityListener;
 import com.example.nunezjonathan_poc.models.Event;
 import com.example.nunezjonathan_poc.tasks.DatabaseDeleteTask;
 import com.example.nunezjonathan_poc.tasks.DatabaseInsertTask;
+import com.example.nunezjonathan_poc.utils.CalendarUtils;
 import com.example.nunezjonathan_poc.utils.OptionalServices;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
@@ -22,6 +24,7 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QuerySnapshot;
 
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.List;
 
 import static com.example.nunezjonathan_poc.databases.FirestoreDatabase.getFamilyId;
@@ -54,6 +57,7 @@ public class SleepRepository {
                         .document(childDocumentId)
                         .collection(FirestoreDatabase.COLLECTION_EVENT)
                         .whereEqualTo("eventType", SLEEP)
+                        .limit(25)
                         .get()
                         .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
                             @Override
@@ -89,11 +93,11 @@ public class SleepRepository {
         return mSleepRoom;
     }
 
-    public void insertSleepEvent(Event event) {
+    public void insertSleepEvent(EventActivityListener listener, Event event) {
         if (OptionalServices.cloudSyncEnabled(mApplication)) {
-            FirestoreDatabase.addEventToDB(mApplication, event);
+            FirestoreDatabase.addEventToDB(listener, mApplication, event);
         } else {
-            new DatabaseInsertTask(mDao, mApplication).execute(event);
+            new DatabaseInsertTask(listener, mDao, mApplication).execute(event);
         }
     }
 

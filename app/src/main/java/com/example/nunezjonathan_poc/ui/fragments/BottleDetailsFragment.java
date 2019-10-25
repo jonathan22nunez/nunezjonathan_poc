@@ -1,9 +1,11 @@
 package com.example.nunezjonathan_poc.ui.fragments;
 
 import android.os.Bundle;
+import android.os.Handler;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.SeekBar;
 import android.widget.TextView;
 import androidx.annotation.NonNull;
@@ -12,17 +14,22 @@ import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProviders;
 import androidx.navigation.Navigation;
 import com.example.nunezjonathan_poc.R;
+import com.example.nunezjonathan_poc.interfaces.EventActivityListener;
 import com.example.nunezjonathan_poc.models.Event;
 import com.example.nunezjonathan_poc.ui.viewModels.FeedingViewModel;
 
 import java.util.Locale;
 
-public class BottleDetailsFragment extends Fragment {
+import cdflynn.android.library.checkview.CheckView;
+
+public class BottleDetailsFragment extends Fragment implements EventActivityListener {
 
     private FeedingViewModel feedingViewModel;
     private TextView startAmount, endAmount;
     private double startingAmount;
     private double endingAmount;
+    private Button saveButton;
+    private CheckView checkView;
 
     private View.OnClickListener saveButtonClickListener = new View.OnClickListener() {
         @Override
@@ -35,8 +42,7 @@ public class BottleDetailsFragment extends Fragment {
                 Event feedingEvent = new Event(Event.EventType.BOTTLE, startDatetime, duration,
                         -1, -1, startingAmount, endingAmount, Event.Color.NONE, Event.Hardness.NONE);
 
-                feedingViewModel.insertFeedingEvent(feedingEvent);
-                Navigation.findNavController(getActivity(), R.id.nav_host_fragment).popBackStack();
+                feedingViewModel.insertFeedingEvent(BottleDetailsFragment.this, feedingEvent);
             }
         }
     };
@@ -94,6 +100,29 @@ public class BottleDetailsFragment extends Fragment {
             }
         });
 
-        view.findViewById(R.id.button_save_bottle).setOnClickListener(saveButtonClickListener);
+        checkView = view.findViewById(R.id.check);
+        saveButton = view.findViewById(R.id.button_save_bottle);
+        saveButton.setOnClickListener(saveButtonClickListener);
+    }
+
+    @Override
+    public void savedSuccessfully() {
+        saveButton.setVisibility(View.GONE);
+        checkView.check();
+        final Handler handler = new Handler();
+        handler.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                checkView.uncheck();
+                handler.postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        if (getActivity() != null) {
+                            Navigation.findNavController(getActivity(), R.id.nav_host_fragment).popBackStack();
+                        }
+                    }
+                }, 500);
+            }
+        }, 1000);
     }
 }

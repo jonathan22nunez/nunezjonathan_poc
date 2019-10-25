@@ -9,16 +9,19 @@ import android.widget.Toast;
 
 import com.example.nunezjonathan_poc.daos.EventDao;
 import com.example.nunezjonathan_poc.databases.FirestoreDatabase;
+import com.example.nunezjonathan_poc.interfaces.EventActivityListener;
 import com.example.nunezjonathan_poc.models.Event;
 
 public class DatabaseInsertTask extends AsyncTask<Event, Void, LongSparseArray<Event>> {
 
     private final EventDao mDao;
     private final Application mApplication;
+    private EventActivityListener mListener;
 
-    public DatabaseInsertTask(EventDao mDao, Application mApplication) {
+    public DatabaseInsertTask(EventActivityListener listener, EventDao mDao, Application mApplication) {
         this.mDao = mDao;
         this.mApplication = mApplication;
+        this.mListener = listener;
     }
 
     @Override
@@ -45,7 +48,10 @@ public class DatabaseInsertTask extends AsyncTask<Event, Void, LongSparseArray<E
         if (lsa != null) {
             long rowId = lsa.keyAt(0);
             if (rowId != -1) {
-                Toast.makeText(mApplication, "Saved Successfully", Toast.LENGTH_SHORT).show();
+                if (mListener != null) {
+                    mListener.savedSuccessfully();
+//                    Toast.makeText(mApplication, "Saved Successfully", Toast.LENGTH_SHORT).show();
+                }
             }
         }
     }

@@ -7,6 +7,7 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 
+import com.example.nunezjonathan_poc.interfaces.EventActivityListener;
 import com.example.nunezjonathan_poc.models.Child;
 import com.example.nunezjonathan_poc.models.Event;
 import com.example.nunezjonathan_poc.models.Health;
@@ -36,7 +37,7 @@ public abstract class FirestoreDatabase {
         return sharedPrefs.getString("family_id", null);
     }
 
-    public static void addChildToDB(final Application application, final Child child, final boolean setToCurrent) {
+    public static void addChildToDB(final EventActivityListener listener, final Application application, final Child child, final boolean setToCurrent) {
         String familyId = getFamilyId(application);
         if (familyId != null) {
             DocumentReference docRef = FirebaseFirestore.getInstance()
@@ -57,14 +58,37 @@ public abstract class FirestoreDatabase {
                                 sharedPrefs.edit().putString("childName", child.name).apply();
                                 sharedPrefs.edit().putString("childImageUriString", child.imageStringUri).apply();
 
-                                Toast.makeText(application, "Successfully created Child Profile", Toast.LENGTH_SHORT).show();
+                                listener.savedSuccessfully();
+//                                Toast.makeText(application, "Successfully created Child Profile", Toast.LENGTH_SHORT).show();
                             }
                         }
                     });
         }
     }
 
-    public static void addEventToDB(final Application application, Event event) {
+    public static void updateChildInDB(final EventActivityListener listener, final Application application, final Child child) {
+        String familyId = getFamilyId(application);
+        if (familyId != null) {
+            FirebaseFirestore.getInstance()
+                    .collection(COLLECTION_FAMILIES)
+                    .document(familyId)
+                    .collection(COLLECTION_CHILDREN)
+                    .document(child.documentId)
+                    .set(child)
+                    .addOnSuccessListener(new OnSuccessListener<Void>() {
+                        @Override
+                        public void onSuccess(Void aVoid) {
+                            SharedPreferences sharedPreferences = application.getSharedPreferences("currentChild", Context.MODE_PRIVATE);
+                            sharedPreferences.edit().putString("childName", child.name).apply();
+
+                            listener.savedSuccessfully();
+//                            Toast.makeText(application, "Updated Child Profile", Toast.LENGTH_SHORT).show();
+                        }
+                    });
+        }
+    }
+
+    public static void addEventToDB(final EventActivityListener listener, final Application application, Event event) {
         String familyId = getFamilyId(application);
         if (familyId != null) {
             SharedPreferences sharedPrefs = application.getSharedPreferences("currentChild", Context.MODE_PRIVATE);
@@ -84,7 +108,7 @@ public abstract class FirestoreDatabase {
                         .addOnSuccessListener(new OnSuccessListener<Void>() {
                             @Override
                             public void onSuccess(Void aVoid) {
-                                Toast.makeText(application, "Saved Successfully", Toast.LENGTH_SHORT).show();
+                                listener.savedSuccessfully();
                             }
                         });
             }
@@ -103,6 +127,10 @@ public abstract class FirestoreDatabase {
                     .addOnSuccessListener(new OnSuccessListener<Void>() {
                         @Override
                         public void onSuccess(Void aVoid) {
+                            SharedPreferences sharedPrefs = application.getSharedPreferences("currentChild", Context.MODE_PRIVATE);
+                            sharedPrefs.edit().putString("childDocumentId", null).apply();
+                            sharedPrefs.edit().putString("childName", "Child").apply();
+
                             Toast.makeText(application, "Successfully created Child Profile", Toast.LENGTH_SHORT).show();
                         }
                     });
@@ -123,7 +151,7 @@ public abstract class FirestoreDatabase {
         }
     }
 
-    public static void addHealthToDB(final Application application, Health health) {
+    public static void addHealthToDB(final EventActivityListener listener, final Application application, Health health) {
         String familyId = getFamilyId(application);
         if (familyId != null) {
             SharedPreferences sharedPrefs = application.getSharedPreferences("currentChild", Context.MODE_PRIVATE);
@@ -144,7 +172,7 @@ public abstract class FirestoreDatabase {
                         .addOnSuccessListener(new OnSuccessListener<Void>() {
                             @Override
                             public void onSuccess(Void aVoid) {
-                                Toast.makeText(application, "Saved Successfully", Toast.LENGTH_SHORT).show();
+                                listener.savedSuccessfully();
                             }
                         });
             }
@@ -165,7 +193,7 @@ public abstract class FirestoreDatabase {
         }
     }
 
-    public static void deleteChildren(Application application) {
+    public static void deleteChildren(final Application application) {
         String familyId = getFamilyId(application);
         if (familyId != null) {
             FirebaseFirestore.getInstance().collection(COLLECTION_FAMILIES)
@@ -179,7 +207,7 @@ public abstract class FirestoreDatabase {
                                 for (QueryDocumentSnapshot document :
                                         task.getResult()) {
                                     Child child = document.toObject(Child.class);
-                                    //FirestoreDatabase.deleteChildInDB(String.valueOf(child._id));
+                                    FirestoreDatabase.deleteChildInDB(application, String.valueOf(child.documentId));
                                 }
                             }
 

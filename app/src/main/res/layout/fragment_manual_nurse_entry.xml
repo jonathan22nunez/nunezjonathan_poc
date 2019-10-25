@@ -42,6 +42,17 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"/>
 
+    <cdflynn.android.library.checkview.CheckView
+        android:id="@+id/check"
+        android:layout_width="64dp"
+        android:layout_height="64dp"
+        app:checkView_strokeColor="@color/saveButtonColor"
+        app:checkView_strokeWidth="5dp"
+        app:layout_constraintTop_toBottomOf="@id/timePicker_endTime"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"/>
+
     <Button
         android:id="@+id/button_save_manual_nurse"
         style="@style/SaveButton"

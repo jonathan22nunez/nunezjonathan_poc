@@ -18,6 +18,7 @@ import com.example.nunezjonathan_poc.utils.CalendarUtils;
 import com.example.nunezjonathan_poc.utils.TimeUtils;
 
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.List;
 
 public class EventAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
@@ -29,10 +30,21 @@ public class EventAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
     public EventAdapter(Context context, List<Event> eventsList) {
         this.mContext = context;
         this.eventsList = eventsList;
+
     }
 
     public EventAdapter(List<Event> eventsList) {
         this.eventsList = eventsList;
+    }
+
+    class HeaderViewHolder extends RecyclerView.ViewHolder {
+        TextView headerTitle;
+
+        public HeaderViewHolder(@NonNull View itemView) {
+            super(itemView);
+
+            headerTitle = itemView.findViewById(R.id.header_title);
+        }
     }
 
     class SleepViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
@@ -49,10 +61,8 @@ public class EventAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
 
         public void setSleepViewHolder(Event event) {
             duration.setText(TimeUtils.timerHMS(event.duration));
-            String startTime = CalendarUtils.toTimeHMString(CalendarUtils.stringToCalendar(event.datetime));
-            String endTime = CalendarUtils.getEndDatetime(event.datetime, event.duration);
-            String time = startTime + " - " + endTime;
-            timeStartEnd.setText(time);
+            String datetime = CalendarUtils.toDatetimeString(CalendarUtils.stringToCalendar(event.datetime).getTime());
+            timeStartEnd.setText(datetime);
         }
 
         @Override
@@ -79,15 +89,16 @@ public class EventAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
 
         public void setFeedingViewHolder(Event event) {
             duration.setText(TimeUtils.timerMS(event.duration));
-            time.setText(CalendarUtils.toTimeHMString(CalendarUtils.stringToCalendar(event.datetime)));
+            String datetime = CalendarUtils.toDatetimeString(CalendarUtils.stringToCalendar(event.datetime).getTime());
+            time.setText(datetime);
             String leftText = "";
             String rightText = "";
             if (event.eventType == Event.EventType.NURSE) {
-                leftText = "Left: " + TimeUtils.timerMS(event.leftSideDuration);
-                rightText = "Right: " + TimeUtils.timerMS(event.rightSideDuration);
+                if (event.leftSideDuration > 0) leftText = "Left: " + TimeUtils.timerMS(event.leftSideDuration);
+                if (event.rightSideDuration > 0) rightText = "Right: " + TimeUtils.timerMS(event.rightSideDuration);
             } else if (event.eventType == Event.EventType.BOTTLE) {
-                leftText = "Start Amount: " + event.startAmount;
-                rightText = "End Amount: " + event.endAmount;
+                if (event.startAmount > 0) leftText = "Start Amount: " + event.startAmount;
+                if (event.endAmount > 0) rightText = "End Amount: " + event.endAmount;
             }
             leftSubtext.setText(leftText);
             rightSubtext.setText(rightText);
@@ -129,7 +140,8 @@ public class EventAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
                     break;
             }
 
-            time.setText(CalendarUtils.toTimeHMString(CalendarUtils.stringToCalendar(event.datetime)));
+            String datetime = CalendarUtils.toDatetimeString(CalendarUtils.stringToCalendar(event.datetime).getTime());
+            time.setText(datetime);
             if (event.color != Event.Color.NONE) {
                 color.setImageDrawable(mContext.getResources().getDrawable(event.color, null));
             }
@@ -160,6 +172,9 @@ public class EventAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
     public RecyclerView.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         View view;
         switch (viewType) {
+            case -1:
+                view = LayoutInflater.from(parent.getContext()).inflate(R.layout.header_item, parent, false);
+                return new HeaderViewHolder(view);
             case Event.EventType.SLEEP:
                 view = LayoutInflater.from(parent.getContext()).inflate(R.layout.sleep_log_item, parent, false);
                 return new SleepViewHolder(view);
@@ -180,6 +195,9 @@ public class EventAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
     @Override
     public void onBindViewHolder(@NonNull RecyclerView.ViewHolder holder, int position) {
         switch (getItemViewType(position)) {
+            case -1:
+                ((HeaderViewHolder) holder).headerTitle.setText("Most Recent Entries");
+                break;
             case Event.EventType.SLEEP:
                 ((SleepViewHolder) holder).setSleepViewHolder(eventsList.get(position));
                 break;

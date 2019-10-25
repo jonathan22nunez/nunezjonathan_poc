@@ -10,6 +10,7 @@ import androidx.lifecycle.MutableLiveData;
 import com.example.nunezjonathan_poc.daos.EventDao;
 import com.example.nunezjonathan_poc.databases.AppDatabase;
 import com.example.nunezjonathan_poc.databases.FirestoreDatabase;
+import com.example.nunezjonathan_poc.interfaces.EventActivityListener;
 import com.example.nunezjonathan_poc.models.Event;
 import com.example.nunezjonathan_poc.tasks.DatabaseDeleteTask;
 import com.example.nunezjonathan_poc.tasks.DatabaseInsertTask;
@@ -49,14 +50,16 @@ public class FeedingRepository {
                             .collection(FirestoreDatabase.COLLECTION_CHILDREN)
                             .document(childDocumentId)
                             .collection(FirestoreDatabase.COLLECTION_EVENT)
-                            .whereEqualTo("eventType", Event.EventType.NURSE);
+                            .whereEqualTo("eventType", Event.EventType.NURSE)
+                            .limit(25);
                     Query bottleQuery = rootRef
                             .collection(FirestoreDatabase.COLLECTION_FAMILIES)
                             .document(familyId)
                             .collection(FirestoreDatabase.COLLECTION_CHILDREN)
                             .document(childDocumentId)
                             .collection(FirestoreDatabase.COLLECTION_EVENT)
-                            .whereEqualTo("eventType", Event.EventType.BOTTLE);
+                            .whereEqualTo("eventType", Event.EventType.BOTTLE)
+                            .limit(25);
 
                     Task nurseQueryTask = nurseQuery.get();
                     Task bottleQueryTask = bottleQuery.get();
@@ -102,11 +105,11 @@ public class FeedingRepository {
         return mFeedingRoom;
     }
 
-    public void insertFeedingEvent(Event event) {
+    public void insertFeedingEvent(EventActivityListener listener, Event event) {
         if (OptionalServices.cloudSyncEnabled(mApplication)) {
-            FirestoreDatabase.addEventToDB(mApplication, event);
+            FirestoreDatabase.addEventToDB(listener, mApplication, event);
         } else {
-            new DatabaseInsertTask(mDao, mApplication).execute(event);
+            new DatabaseInsertTask(listener, mDao, mApplication).execute(event);
         }
     }
 

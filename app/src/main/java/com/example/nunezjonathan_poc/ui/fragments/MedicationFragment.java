@@ -5,11 +5,13 @@ import android.app.TimePickerDialog;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.os.Handler;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
 import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.Spinner;
@@ -21,19 +23,24 @@ import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProviders;
 import androidx.navigation.Navigation;
 import com.example.nunezjonathan_poc.R;
+import com.example.nunezjonathan_poc.interfaces.EventActivityListener;
 import com.example.nunezjonathan_poc.models.Health;
 import com.example.nunezjonathan_poc.ui.viewModels.HealthViewModel;
 import com.example.nunezjonathan_poc.utils.CalendarUtils;
 
 import java.util.Calendar;
 
-public class MedicationFragment extends Fragment {
+import cdflynn.android.library.checkview.CheckView;
+
+public class MedicationFragment extends Fragment implements EventActivityListener {
 
     private HealthViewModel healthViewModel;
     private Calendar startDatetime;
     private TextView date, time;
-    private EditText drugName, brandName, dosage, nextDosage, notes;
+    private EditText drugName, brandName, dosage, notes;
     private String dosageUnit = "";
+    private Button saveButton;
+    private CheckView checkView;
 
     private View.OnClickListener dateClickListener = new View.OnClickListener() {
         @Override
@@ -126,8 +133,7 @@ public class MedicationFragment extends Fragment {
                             dosageNum,
                             dosageUnit,
                             -1);
-                    healthViewModel.insertHealth(health);
-                    Navigation.findNavController(getActivity(), R.id.nav_host_fragment).popBackStack();
+                    healthViewModel.insertHealth(MedicationFragment.this, health);
             }
         }
     };
@@ -163,10 +169,32 @@ public class MedicationFragment extends Fragment {
             dosageUnits.setAdapter(spinnerAdapter);
             dosageUnits.setOnItemSelectedListener(dosageUnitItemSelectedListener);
 
-            nextDosage = view.findViewById(R.id.editText_next_dosage);
             notes = view.findViewById(R.id.editText_notes);
 
-            view.findViewById(R.id.button_save_medication).setOnClickListener(saveButtonClickListener);
+            checkView = view.findViewById(R.id.check);
+            saveButton = view.findViewById(R.id.button_save_medication);
+            saveButton.setOnClickListener(saveButtonClickListener);
         }
+    }
+
+    @Override
+    public void savedSuccessfully() {
+        saveButton.setVisibility(View.GONE);
+        checkView.check();
+        final Handler handler = new Handler();
+        handler.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                checkView.uncheck();
+                handler.postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        if (getActivity() != null) {
+                            Navigation.findNavController(getActivity(), R.id.nav_host_fragment).popBackStack();
+                        }
+                    }
+                }, 500);
+            }
+        }, 1000);
     }
 }

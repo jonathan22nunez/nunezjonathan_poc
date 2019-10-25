@@ -18,5 +18,13 @@
             android:orientation="vertical"
             app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"/>
 
+        <TextView
+            android:id="@+id/emptyTextView"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:text="No Activities to Show Yet"
+            android:gravity="center"
+            android:visibility="gone"/>
+
     </RelativeLayout>
 </androidx.coordinatorlayout.widget.CoordinatorLayout>
